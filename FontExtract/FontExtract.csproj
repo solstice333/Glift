@@ -5,8 +5,8 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{F92E2947-AED6-408B-AA16-36EF417B9DD5}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>FontTest</RootNamespace>
-    <AssemblyName>FontTest</AssemblyName>
+    <RootNamespace>FontExtract</RootNamespace>
+    <AssemblyName>FontExtract</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
