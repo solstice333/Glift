@@ -3,6 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FontTest", "FontTest\FontTest.csproj", "{F92E2947-AED6-408B-AA16-36EF417B9DD5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Typography", "Typography", "{48A496B7-ADFC-4CFA-9224-4F5163555535}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Typography.OpenFont", "Typography\Typography.OpenFont\Typography.OpenFont.shproj", "{235A071B-8D06-40AE-A5C5-B1CE59715EE9}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Typography.GlyphLayout", "Typography\Typography.GlyphLayout\Typography.GlyphLayout.shproj", "{D8861CF8-C506-472B-8A57-632BD6CA6496}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -15,6 +21,8 @@ Global
 		{F92E2947-AED6-408B-AA16-36EF417B9DD5}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{235A071B-8D06-40AE-A5C5-B1CE59715EE9} = {48A496B7-ADFC-4CFA-9224-4F5163555535}
+		{D8861CF8-C506-472B-8A57-632BD6CA6496} = {48A496B7-ADFC-4CFA-9224-4F5163555535}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

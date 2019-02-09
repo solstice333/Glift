@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-//using Typography.OpenFont;
+using Typography.OpenFont;
 
 namespace FontTest {
     class MainClass {
@@ -9,10 +9,10 @@ namespace FontTest {
                Path.Combine(Directory.GetCurrentDirectory(),
                   "..", "..", "Resources", "Typeface.ttf"));
 
-            //using (var ttf = File.OpenRead(ttfPath)) {
-            //    var fr = new OpenFontReader();
-            //    Typeface tf = fr.Read(ttf);
-            //}
+            using (var ttf = File.OpenRead(ttfPath)) {
+                var fr = new OpenFontReader();
+                Typeface tf = fr.Read(ttf);
+            }
         }
     }
 }

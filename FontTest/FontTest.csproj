@@ -44,5 +44,7 @@
   <ItemGroup>
     <None Include="Resources\Typeface.ttf" />
   </ItemGroup>
+  <Import Project="..\Typography\Typography.OpenFont\Typography.OpenFont.projitems" Label="Shared" Condition="Exists('..\Typography\Typography.OpenFont\Typography.OpenFont.projitems')" />
+  <Import Project="..\Typography\Typography.GlyphLayout\Typography.GlyphLayout.projitems" Label="Shared" Condition="Exists('..\Typography\Typography.GlyphLayout\Typography.GlyphLayout.projitems')" />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
