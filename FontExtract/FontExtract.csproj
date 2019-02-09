@@ -33,6 +33,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Numerics" />
+    <Reference Include="NDesk.Options">
+      <HintPath>..\packages\NDesk.Options.0.2.1\lib\NDesk.Options.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -43,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Typeface.ttf" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="..\Typography\Typography.OpenFont\Typography.OpenFont.projitems" Label="Shared" Condition="Exists('..\Typography\Typography.OpenFont\Typography.OpenFont.projitems')" />
   <Import Project="..\Typography\Typography.GlyphLayout\Typography.GlyphLayout.projitems" Label="Shared" Condition="Exists('..\Typography\Typography.GlyphLayout\Typography.GlyphLayout.projitems')" />
