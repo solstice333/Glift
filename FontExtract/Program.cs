@@ -15,7 +15,6 @@ using Util;
 namespace FontTest {
     static class Args {
         public static bool help = false;
-        public static bool allGlyphs = true;
         public static List<char> chars = new List<char>();
         public static int xoffset = 0;
         public static int yoffset = 0;
@@ -33,7 +32,6 @@ namespace FontTest {
                             help = true;
                             exst = 1;
                         }
-                        allGlyphs = false;
                         chars.Add(v[0]);
                     }
                 }
@@ -99,7 +97,8 @@ namespace FontTest {
     class MainClass {
         public static void Main(string[] args) {
             Args.Parse(args);
-            Console.WriteLine($"want all glyphs?: {Args.allGlyphs}");
+            bool allGlyphs = Args.chars.Count == 0;
+            Console.WriteLine($"want all glyphs?: {allGlyphs}");
             Console.WriteLine($"chars: {Args.chars.ToString<char>()}");
             Console.WriteLine($"x offset: {Args.xoffset}");
             Console.WriteLine($"y offset: {Args.yoffset}");
