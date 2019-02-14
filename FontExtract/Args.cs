@@ -14,8 +14,8 @@ namespace ArgParse {
 
         private static OptionSet _parser = new OptionSet {
             {
-                "c|char=", "specify a glyph to convert to .obj. " +
-                "Exit 1 if VALUE is not a single character. " +
+                "c|char=", "specify a glyph by codepoint to convert " +
+                "to .obj. Exit 1 if VALUE is not a single character. " +
                 "If not specified, defaults to all glyphs in the ttf. " +
                 "This can stack",
                 v => {
@@ -29,7 +29,9 @@ namespace ArgParse {
                 }
             },
             {
-                "s|size=", "size in points (1/72 of 1 inch). Defaults to 300",
+                "s|size=", "size in points (1/72 of 1 inch). " +
+                "Defaults to 300. Exit 1 if VALUE is not a valid floating " +
+                "point",
                 v => {
                     help = !float.TryParse(v, out sizePt);
                     exst = help ? 1 : 0;
