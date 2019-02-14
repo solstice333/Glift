@@ -9,12 +9,14 @@ namespace ArgParse {
         public static int xoffset = 0;
         public static int yoffset = 0;
         public static string ttfPath = "";
+        public static float sizePt = 300f;
         public static int exst = 0;
 
         private static OptionSet _parser = new OptionSet {
             {
                 "c|char=", "specify a glyph to convert to .obj. " +
                 "Exit 1 if VALUE is not a single character. " +
+                "If not specified, defaults to all glyphs in the ttf. " +
                 "This can stack",
                 v => {
                     if (v != null) {
@@ -27,10 +29,17 @@ namespace ArgParse {
                 }
             },
             {
+                "s|size=", "size in points (1/72 of 1 inch). Defaults to 300",
+                v => {
+                    help = !float.TryParse(v, out sizePt);
+                    exst = help ? 1 : 0;
+                }
+            },
+            {
                 "x|xoffset=", "translate the model VALUE units across " +
                 "the x axis. Exit 1 if VALUE is a non-integer",
                 v => {
-                    help = !Int32.TryParse(v, out xoffset);
+                    help = !int.TryParse(v, out xoffset);
                     exst = help ? 1 : 0;
                 }
             },
@@ -38,7 +47,7 @@ namespace ArgParse {
                 "y|yoffset=", "translate the model VALUE units across " +
                 "the y axis. Exit 1 if VALUE is a non-integer",
                 v => {
-                    help = !Int32.TryParse(v, out yoffset);
+                    help = !int.TryParse(v, out yoffset);
                     exst = help ? 1 : 0;
                 }
             },
