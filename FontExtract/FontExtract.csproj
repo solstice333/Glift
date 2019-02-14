@@ -8,6 +8,7 @@
     <RootNamespace>FontExtract</RootNamespace>
     <AssemblyName>FontExtract</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,6 +21,7 @@
     <ExternalConsole>true</ExternalConsole>
     <PlatformTarget>x86</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <Optimize>true</Optimize>
@@ -29,6 +31,7 @@
     <ExternalConsole>true</ExternalConsole>
     <PlatformTarget>x86</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -40,12 +43,54 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\Typography\Demo\Shared\DrawingGL.Text\GlyphTranslatorToPath.cs">
+      <Link>DrawingGL.Text\GlyphTranslatorToPath.cs</Link>
+    </Compile>
+    <Compile Include="..\Typography\Demo\Shared\GlyphPathBuilder\GlyphPathBuilder.cs">
+      <Link>GlyphPathBuilder\GlyphPathBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\Typography\Typography.Contours\GlyphPathBuilderBase.cs">
+      <Link>GlyphPathBuilder\GlyphPathBuilderBase.cs</Link>
+    </Compile>
+    <Compile Include="..\Typography\Demo\Shared\DrawingGL\CurveFlattener.cs">
+      <Link>DrawingGL\CurveFlattener.cs</Link>
+    </Compile>
+    <Compile Include="..\Typography\Demo\Shared\DrawingGL\Path.cs">
+      <Link>DrawingGL\Path.cs</Link>
+    </Compile>
+    <Compile Include="..\Typography\Demo\Shared\DrawingGL\Primitives.cs">
+      <Link>DrawingGL\Primitives.cs</Link>
+    </Compile>
+    <Compile Include="..\Typography\Demo\Shared\DrawingGL\TessTool.cs">
+      <Link>DrawingGL\TessTool.cs</Link>
+    </Compile>
+    <Compile Include="..\Typography\Demo\Shared\Tesselate\ActiveRegion.cs">
+      <Link>Tesselate\ActiveRegion.cs</Link>
+    </Compile>
+    <Compile Include="..\Typography\Demo\Shared\Tesselate\ContourVertex.cs">
+      <Link>Tesselate\ContourVertex.cs</Link>
+    </Compile>
+    <Compile Include="..\Typography\Demo\Shared\Tesselate\Dictionary.cs">
+      <Link>Tesselate\Dictionary.cs</Link>
+    </Compile>
+    <Compile Include="..\Typography\Demo\Shared\Tesselate\Face.cs">
+      <Link>Tesselate\Face.cs</Link>
+    </Compile>
+    <Compile Include="..\Typography\Demo\Shared\Tesselate\HalfEdge.cs">
+      <Link>Tesselate\HalfEdge.cs</Link>
+    </Compile>
+    <Compile Include="..\Typography\Demo\Shared\Tesselate\MaxFirstList.cs">
+      <Link>Tesselate\MaxFirstList.cs</Link>
+    </Compile>
+    <Compile Include="..\Typography\Demo\Shared\Tesselate\mesh.cs">
+      <Link>Tesselate\mesh.cs</Link>
+    </Compile>
+    <Compile Include="Util\Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Resources\" />
+    <Folder Include="Util\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Typeface.ttf" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="..\Typography\Typography.OpenFont\Typography.OpenFont.projitems" Label="Shared" Condition="Exists('..\Typography\Typography.OpenFont\Typography.OpenFont.projitems')" />

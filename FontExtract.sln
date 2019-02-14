@@ -9,6 +9,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Typography.OpenFont", "Typo
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Typography.GlyphLayout", "Typography\Typography.GlyphLayout\Typography.GlyphLayout.shproj", "{D8861CF8-C506-472B-8A57-632BD6CA6496}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FontExtractTest", "FontExtractTest\FontExtractTest.csproj", "{C17F91CF-F71F-426E-ADA2-6D6A80CD1911}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -19,6 +21,10 @@ Global
 		{F92E2947-AED6-408B-AA16-36EF417B9DD5}.Debug|x86.Build.0 = Debug|x86
 		{F92E2947-AED6-408B-AA16-36EF417B9DD5}.Release|x86.ActiveCfg = Release|x86
 		{F92E2947-AED6-408B-AA16-36EF417B9DD5}.Release|x86.Build.0 = Release|x86
+		{C17F91CF-F71F-426E-ADA2-6D6A80CD1911}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C17F91CF-F71F-426E-ADA2-6D6A80CD1911}.Debug|x86.Build.0 = Debug|Any CPU
+		{C17F91CF-F71F-426E-ADA2-6D6A80CD1911}.Release|x86.ActiveCfg = Release|Any CPU
+		{C17F91CF-F71F-426E-ADA2-6D6A80CD1911}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{235A071B-8D06-40AE-A5C5-B1CE59715EE9} = {48A496B7-ADFC-4CFA-9224-4F5163555535}
