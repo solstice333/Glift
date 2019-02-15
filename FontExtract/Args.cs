@@ -10,6 +10,9 @@ namespace ArgParse {
         public static int yoffset = 0;
         public static string ttfPath = "";
         public static float sizePt = 300f;
+        public static bool listNames = false;
+        public static bool print = false;
+        public static bool dryRun = false;
         public static int exst = 0;
 
         private static OptionSet _parser = new OptionSet {
@@ -27,6 +30,19 @@ namespace ArgParse {
                         chars.Add(v[0]);
                     }
                 }
+            },
+            {
+                "l|list-names", "list glyph names",
+                v => listNames = true
+            },
+            {
+                "p|print", "print .obj to console",
+                v => print = true
+            },
+            {
+                "d|dry-run", "do not write to .obj. Useful with -p if " +
+                "printing to console is the only requirement",
+                v => dryRun = true
             },
             {
                 "s|size=", "size in points (1/72 of 1 inch). " +
