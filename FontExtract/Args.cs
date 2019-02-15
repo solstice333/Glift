@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using NDesk.Options;
 
-namespace ArgParse {
+namespace FontExtract {
     static class Args {
         public static bool help = false;
         public static List<char> chars = new List<char>();

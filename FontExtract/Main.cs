@@ -12,71 +12,11 @@ using Typography.Contours;
 using DrawingGL;
 using DrawingGL.Text;
 
-using ArgParse;
 using Util;
 
 namespace FontExtract {
     static class Globals {
         public static bool allGlyphs = false;
-    }
-
-    class RawGlyph {
-        private static HashSet<string> _allNames = new HashSet<string>();
-
-        private string _name;
-        private string _filename;
-        private float[] _glyphPts;
-        private int[] _contourEnds;
-
-        public string Name {
-            get => _name; 
-            set { 
-                _name = value ?? "";
-                var fname = _name;
-                while (_allNames.Contains(fname.ToLower()))
-                    fname += "_";
-                _filename = fname;
-                _allNames.Add(_filename.ToLower());
-            }
-        }
-
-        public string Filename {
-            get => _filename;
-        }
-
-        public float[] GlyphPts {
-            get => _glyphPts;
-            set => _glyphPts = value ?? new float[] { };
-        }
-
-        public int[] ContourEnds { 
-            get => _contourEnds;
-            set => _contourEnds = value ?? new int[] { };
-        }
-
-        public RawGlyph() {
-            _name = "";
-            _glyphPts = new float[] { };
-            _contourEnds = new int[] { };
-        }
-
-        public RawGlyph(string name, float[] glyphPts, int[] contourEnds) {
-            Name = name ?? "";
-            GlyphPts = glyphPts ?? new float[] { };
-            ContourEnds = contourEnds ?? new int[] { };
-        }
-
-        public Point2[] Vertices(out int[] contourEnds) {
-            contourEnds = ContourEnds.Select(v => v / 2).ToArray();
-            return Vertices();
-        }
-
-        public Point2[] Vertices() {
-            var pts = new List<Point2>();
-            for (int i = 0; i < GlyphPts.Length; i += 2)
-                pts.Add(new Point2(GlyphPts[i], GlyphPts[i + 1]));
-            return pts.ToArray();
-        }
     }
 
     class MainClass {
@@ -96,7 +36,7 @@ namespace FontExtract {
                 return nameIdxs.Select(nameId => {
                     var builder = new GlyphPathBuilder(typeface);
                     builder.BuildFromGlyphIndex(
-                        typeface.LookupIndex(nameId.glyphIndex), sizeInPoints);
+                        nameId.glyphIndex, sizeInPoints);
 
                     var transl = new GlyphTranslatorToPath();
                     var wrPath = new WritablePath();
@@ -139,8 +79,15 @@ namespace FontExtract {
                 }
 
                 tee?.Invoke($"# {g.Name}");
-                foreach (var p in g.Vertices())
-                    tee?.Invoke($"v {p.X} {p.Y} 0");
+                var vtxCache = new VertexCache(g);
+                foreach (var pt in vtxCache.Vertices)
+                    tee?.Invoke($"v {pt.X} {pt.Y} 0");
+                foreach (var tri in vtxCache.FrontTriangles) {
+                    int vtxIdx1 = vtxCache.IndexOf(tri.P1);
+                    int vtxIdx2 = vtxCache.IndexOf(tri.P2);
+                    int vtxIdx3 = vtxCache.IndexOf(tri.P3);
+                    tee?.Invoke($"f {vtxIdx1} {vtxIdx2} {vtxIdx3}");
+                }
                 tee?.Invoke();
 
                 if (objWriter != null) {
