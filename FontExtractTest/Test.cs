@@ -30,20 +30,31 @@ namespace FontExtractTest {
 
     [TestFixture()]
     public class Test {
-        [Test()]
-        public void HelpTest() {
-            var actual = Path.Combine(
-                Globals.binDir, "fontExtractHelp.txt");
-            var expected = Path.Combine(
-                Globals.resources, "fontExtractHelp.exp");
+        public static string ActualFile(string filename) {
+            return Path.Combine(Globals.binDir, filename);
+        }
 
-            using (var outputFile = File.CreateText(actual))
-            using (var proc = FontExtract.Run("-h")) {
+        public static string ExpectedFile(string filename) {
+            return Path.Combine(Globals.resources, filename);
+        }
+
+        public static void FontExtractRun(string args, string redirectTo) {
+            using (var outputFile = File.CreateText(redirectTo))
+            using (var proc = FontExtract.Run(args)) {
                 proc.Start();
                 outputFile.Write(proc.StandardOutput.ReadToEnd());
             }
+        }
 
+        [Test()]
+        public void HelpTest() {
+            var actual = ActualFile("fontExtractHelp.txt");
+            var expected = ExpectedFile("fontExtractHelp.exp");
+            FontExtractRun("-h", actual);
             FileAssert.AreEqual(actual, expected);
         }
+
+        public void AObjTest() { }
+        public void SObjTest() { }
     }
 }
