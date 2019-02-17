@@ -31,7 +31,7 @@ namespace FontExtractTest {
     [TestFixture()]
     public class Test {
         [Test()]
-        public void TestCase() {
+        public void HelpTest() {
             var actual = Path.Combine(
                 Globals.binDir, "fontExtractHelp.txt");
             var expected = Path.Combine(
