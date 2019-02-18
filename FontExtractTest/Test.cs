@@ -65,7 +65,7 @@ namespace FontExtractTest {
         }
 
         [OneTimeSetUp]
-        public void Init() {
+        public void SetUpOnce() {
             Directory.SetCurrentDirectory(Globals.thisBinDir);
         }
 
@@ -93,6 +93,12 @@ namespace FontExtractTest {
             var ttf = TtfFile("Alef-Bold.ttf");
             FontExtractRun($"-c S {ttf}");
             FileAssert.AreEqual(actual, expected);
+        }
+
+        [OneTimeTearDown]
+        public void TearDownOnce() {
+            File.Delete(FileInThisBinDir("A.obj"));
+            File.Delete(FileInThisBinDir("S.obj"));
         }
     }
 }
