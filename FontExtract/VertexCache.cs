@@ -31,8 +31,8 @@ namespace FontExtract {
     }
 
     public class VertexNotFoundException : KeyNotFoundException {
-        public VertexNotFoundException(Point3 point) :
-            base($"vertex {point} not found") { }
+        public VertexNotFoundException(Point3 point, Exception e = null) :
+            base($"vertex {point} not found", e) { }
     }
 
     public class VertexCache {
