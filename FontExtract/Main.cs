@@ -81,8 +81,8 @@ namespace FontExtract {
                 tee?.Invoke($"# {g.Name}");
                 var vtxCache = new VertexCache(g);
                 foreach (var pt in vtxCache.Vertices)
-                    tee?.Invoke($"v {pt.X} {pt.Y} 0");
-                foreach (var tri in vtxCache.FrontTriangles) {
+                    tee?.Invoke($"v {pt.X} {pt.Y} {pt.Z}");
+                foreach (var tri in vtxCache.Triangles) {
                     int vtxIdx1 = vtxCache.IndexOf(tri.P1);
                     int vtxIdx2 = vtxCache.IndexOf(tri.P2);
                     int vtxIdx3 = vtxCache.IndexOf(tri.P3);

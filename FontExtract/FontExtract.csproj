@@ -89,7 +89,8 @@
     <Compile Include="Args.cs" />
     <Compile Include="RawGlyph.cs" />
     <Compile Include="VertexCache.cs" />
-    <Compile Include="Triangle.cs" />
+    <Compile Include="Triangle2.cs" />
+    <Compile Include="Triangle3.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Util\" />

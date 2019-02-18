@@ -1,34 +1,47 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Tesselate;
 
 using Point2 = System.Numerics.Vector2;
+using Point3 = System.Numerics.Vector3;
+
+using Util;
 
 namespace FontExtract {
-    using VCacheList = List<(Point2 Point, int Index)>;
-    using VCacheDict = Dictionary<Point2, int>;
+    using VCacheList = List<(Point3 Point, int Index)>;
+    using VCacheDict = Dictionary<Point3, int>;
 
-    public static class Point2Ext {
+    public static class PointExt {
         public static float Epsilon = 0.001f;
 
-        public static bool EqualsEps(this Point2 p1, Point2 p2) {
+        public static bool EqualsEps(this Point3 p1, Point3 p2) {
             return p1.X > p2.X - Epsilon && p1.X < p2.X + Epsilon &&
-                p1.Y > p2.Y - Epsilon && p1.Y < p2.Y + Epsilon; 
+                p1.Y > p2.Y - Epsilon && p1.Y < p2.Y + Epsilon &&
+                p1.Z > p2.Z - Epsilon && p1.Z < p2.Z + Epsilon;
+        }
+
+        public static Point2 ToPoint2(this Point3 p) {
+            return new Point2(p.X, p.Y);
+        }
+
+        public static Point3 ToPoint3(this Point2 p, float z = 0) {
+            return new Point3(p.X, p.Y, z);
         }
     }
 
     public class VertexNotFoundException : KeyNotFoundException {
-        public VertexNotFoundException(Point2 point) :
+        public VertexNotFoundException(Point3 point) :
             base($"vertex {point} not found") { }
     }
 
     public class VertexCache {
         private Type _containType;
-        private Dictionary<Point2, int> _vert_d;
-        private List<(Point2 Point, int Index)> _vert_l;
+        private VCacheDict _vert_d;
+        private VCacheList _vert_l;
         private RawGlyph _glyph;
         private int _idx;
-        private List<Triangle> _tris;
+        private List<Triangle3> _tris;
 
         public enum Type { List, Dict }
 
@@ -46,10 +59,10 @@ namespace FontExtract {
 
         private void _GatherMainOutline() {
             foreach (var p in _glyph.Vertices())
-                Add(p);
+                Add(new Point3(p.X, p.Y, 0));
         }
 
-        private void _GatherTessOutline() {
+        private void _GatherFrontTessOutline() {
             TessTool tessa = new TessTool();
             if (!tessa.TessPolygon(_glyph.GlyphPts, _glyph.ContourEnds))
                 return;
@@ -63,20 +76,25 @@ namespace FontExtract {
             foreach (var i in indices) {
                 if (i >= oldVertLen) {
                     TessVertex2d extra = extras[i - oldVertLen];
-                    var newPoint = new Point2((float)extra.x, (float)extra.y);
+                    var newPoint = new Point2( (float)extra.x, (float)extra.y);
                     vertices.Add(newPoint);
-                    Add(newPoint);
+                    Add(newPoint.ToPoint3());
                 }
                 else
                     vertices.Add(oldVerts[i]);
             }
 
             for (int i = 0; i < vertices.Count; i += 3) {
-                _tris.Add(new Triangle {
-                    P1 = vertices[i],
-                    P2 = vertices[i + 1],
-                    P3 = vertices[i + 2]
-                });
+                var v1 = vertices[i];
+                var v2 = vertices[i + 1];
+                var v3 = vertices[i + 2];
+                var frontTri = new Triangle2 {
+                    P1 = v1,
+                    P2 = v2,
+                    P3 = v3
+                }.Front();
+
+                _tris.Add(frontTri.ToTriangle3());
             }
         }
 
@@ -86,18 +104,14 @@ namespace FontExtract {
             _vert_l = new VCacheList();
             _glyph = glyph;
             _idx = 0;
-            _tris = new List<Triangle>();
+            _tris = new List<Triangle3>();
 
             _GatherMainOutline();
-            _GatherTessOutline();
+            _GatherFrontTessOutline();
         }
 
-        public Triangle[] FrontTriangles {
-            get => _tris.Select(tri => tri.Front()).ToArray();
-        }
-
-        public Triangle[] BackTriangles {
-            get => _tris.Select(tri => tri.Back()).ToArray();
+        public Triangle3[] Triangles {
+            get => _tris.ToArray();
         }
 
         public Type ContainerType {
@@ -111,21 +125,21 @@ namespace FontExtract {
             }
         }
 
-        public void Add(Point2 vertex) {
+        public void Add(Point3 vertex) {
             if (_containType == Type.Dict)
                 _vert_d[vertex] = ++_idx;
             else
                 _vert_l.Add((vertex, ++_idx));
         }
 
-        public bool Contains(Point2 vertex) {
+        public bool Contains(Point3 vertex) {
             if (_containType == Type.Dict)
                 return _vert_d.ContainsKey(vertex);
             try { return IndexOf(vertex) >= 0; }
             catch (VertexNotFoundException) { return false; }
         }
 
-        public int IndexOf(Point2 vertex) {
+        public int IndexOf(Point3 vertex) {
             if (_containType == Type.Dict) {
                 try { return _vert_d[vertex]; }
                 catch (KeyNotFoundException) {
@@ -139,7 +153,7 @@ namespace FontExtract {
             throw new VertexNotFoundException(vertex);
         }
 
-        public IEnumerable<Point2> Vertices {
+        public IEnumerable<Point3> Vertices {
             get {
                 if (_containType == Type.Dict)
                     foreach (var entry in _vert_d.OrderBy(e => e.Value))
