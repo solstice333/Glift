@@ -91,6 +91,8 @@
     <Compile Include="VertexCache.cs" />
     <Compile Include="Triangle2.cs" />
     <Compile Include="Triangle3.cs" />
+    <Compile Include="SideFace.cs" />
+    <Compile Include="Point3Pair.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Util\" />

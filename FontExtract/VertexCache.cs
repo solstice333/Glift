@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Numerics;
 using Tesselate;
 
 using Point2 = System.Numerics.Vector2;
@@ -41,6 +42,9 @@ namespace FontExtract {
         private VCacheList _vert_l;
         private RawGlyph _glyph;
         private int _idx;
+        private int _zdepth;
+        private Point3[] _extrudedPoints;
+        private List<SideFace> _sideFaces;
         private List<Triangle3> _tris;
 
         public enum Type { List, Dict }
@@ -98,16 +102,64 @@ namespace FontExtract {
             }
         }
 
-        public VertexCache(RawGlyph glyph, Type containerType = Type.List) {
+        private void _GatherExtrudePoints() {
+            var transl = Matrix4x4.CreateTranslation(0, 0, _zdepth);
+            var extPoints = 
+                Vertices.Select(p => Vector3.Transform(p, transl)).ToArray();
+            _extrudedPoints = extPoints;
+            foreach (var p in extPoints) Add(p);
+        }
+
+        private void _GatherSideTess() {
+            Point3Pair[] pps = Vertices.Zip(_extrudedPoints, 
+                (p1, p2) => new Point3Pair(p1, p2)).ToArray();
+
+            int[] contourEnds;
+            _glyph.Vertices(out contourEnds);
+
+            int start = 0;
+            int i = 0;
+            foreach (int contourEnd in contourEnds) {
+                for (i = start; i <= contourEnd; ++i) {
+                    if (i == contourEnd) {
+                        if (pps[i] != pps[start])
+                            _sideFaces.Add(new SideFace(pps[i], pps[start]));
+                    }
+                    else if (pps[i] != pps[i + 1])
+                        _sideFaces.Add(new SideFace(pps[i], pps[i + 1]));
+                }
+                start = i;
+            }
+
+            foreach (var sideFace in _sideFaces) {
+                Point3 firstFrontCorner = sideFace.PP1.P1;
+                Point3 oppositeBackCorner = sideFace.PP2.P2;
+                Point3 firstBackCorner = sideFace.PP1.P2;
+                _tris.Add(new Triangle3(
+                    firstFrontCorner, oppositeBackCorner, firstBackCorner));
+
+                Point3 oppositeFrontCorner = sideFace.PP2.P1;
+                _tris.Add(new Triangle3(
+                    firstFrontCorner, oppositeFrontCorner, oppositeBackCorner));
+            }
+        }
+
+        public VertexCache(
+            RawGlyph glyph, int zdepth = 0, Type containerType = Type.List) {
             _containType = containerType;
             _vert_d = new VCacheDict();
             _vert_l = new VCacheList();
             _glyph = glyph;
             _idx = 0;
+            _zdepth = zdepth;
+            _extrudedPoints = null;
+            _sideFaces = new List<SideFace>();
             _tris = new List<Triangle3>();
 
             _GatherMainOutline();
             _GatherFrontTessOutline();
+            _GatherExtrudePoints();
+            _GatherSideTess();
         }
 
         public Triangle3[] Triangles {

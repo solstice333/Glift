@@ -8,6 +8,7 @@ namespace FontExtract {
         public static List<char> chars = new List<char>();
         public static int xoffset = 0;
         public static int yoffset = 0;
+        public static int zdepth = -50;
         public static string ttfPath = "";
         public static float sizePt = 300f;
         public static bool listNames = false;
@@ -66,6 +67,15 @@ namespace FontExtract {
                 "the y axis. Exit 1 if VALUE is a non-integer",
                 v => {
                     help = !int.TryParse(v, out yoffset);
+                    exst = help ? 1 : 0;
+                }
+            },
+            {
+                "z|zdepth=", "depth of the extrusion VALUE units across " +
+                "the z axis. Defaults to 50. Exit 1 if VALUE is a non-integer",
+                v => {
+                    help = !int.TryParse(v, out zdepth);
+                    zdepth = -zdepth;
                     exst = help ? 1 : 0;
                 }
             },
