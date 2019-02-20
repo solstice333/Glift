@@ -36,30 +36,97 @@ namespace FontExtract {
             base($"vertex {point} not found", e) { }
     }
 
-    public class VertexCache {
-        private Type _containType;
+
+    public class VertexStore {
         private VCacheDict _vert_d;
         private VCacheList _vert_l;
-        private RawGlyph _glyph;
+        private Type _containType;
         private int _idx;
+
+        public enum Type { List, Dict }
+
+        private void _MigrateToDict() {
+            if (_containType == Type.Dict)
+                return;
+            foreach (var entry in _vert_l)
+                _vert_d[entry.Point] = entry.Index;
+            _vert_l.Clear();
+            _containType = Type.Dict;
+        }
+
+        private void _MigrateToList() {
+            if (_containType == Type.List)
+                return;
+            foreach (var entry in _vert_d.OrderBy(e => e.Value))
+                _vert_l.Add((entry.Key, entry.Value));
+            _vert_d.Clear();
+            _containType = Type.List;
+        }
+
+        public VertexStore(Type containType = Type.List) {
+            _containType = containType;
+            _idx = 0;
+            _vert_d = new VCacheDict();
+            _vert_l = new VCacheList();
+        }
+
+        public VertexStore.Type ContainerType {
+            get => _containType;
+            set {
+                if (value == Type.List)
+                    _MigrateToList();
+                else
+                    _MigrateToDict();
+            }
+        }
+
+        public void Add(Point3 vertex) {
+            if (_containType == Type.Dict)
+                _vert_d[vertex] = ++_idx;
+            else
+                _vert_l.Add((vertex, ++_idx));
+        }
+
+        public bool Contains(Point3 vertex) {
+            if (_containType == Type.Dict)
+                return _vert_d.ContainsKey(vertex);
+            try { return IndexOf(vertex) >= 0; }
+            catch (VertexNotFoundException) { return false; }
+        }
+
+        public int IndexOf(Point3 vertex) {
+            if (_containType == Type.Dict) {
+                try { return _vert_d[vertex]; }
+                catch (KeyNotFoundException) {
+                    throw new VertexNotFoundException(vertex);
+                }
+            }
+
+            foreach (var e in _vert_l)
+                if (vertex.EqualsEps(e.Point))
+                    return e.Index;
+            throw new VertexNotFoundException(vertex);
+        }
+
+        public IEnumerable<Point3> Vertices {
+            get {
+                if (_containType == Type.Dict)
+                    foreach (var entry in _vert_d.OrderBy(e => e.Value))
+                        yield return entry.Key;
+                else
+                    foreach (var entry in _vert_l)
+                        yield return entry.Point;
+            }
+        }
+    }
+
+    public class VertexCache {
+        private RawGlyph _glyph;
+        private VertexStore _vertexStore;
         private int _zdepth;
         private Point3[] _extrudedPoints;
         private List<SideFace> _sideFaces;
         private List<Triangle3> _tris;
-
-        public enum Type { List, Dict }
-
-        private void _Migrate(VCacheList src, VCacheDict dst) {
-            foreach (var entry in src)
-                dst[entry.Point] = entry.Index;
-            src.Clear();
-        }
-
-        private void _Migrate(VCacheDict src, VCacheList dst) {
-            foreach (var entry in src.OrderBy(e => e.Value))
-                dst.Add((entry.Key, entry.Value));
-            src.Clear();
-        }
 
         private void _GatherMainOutline() {
             foreach (var p in _glyph.Vertices())
@@ -145,12 +212,10 @@ namespace FontExtract {
         }
 
         public VertexCache(
-            RawGlyph glyph, int zdepth = 0, Type containerType = Type.List) {
-            _containType = containerType;
-            _vert_d = new VCacheDict();
-            _vert_l = new VCacheList();
+            RawGlyph glyph, int zdepth = 0, 
+            VertexStore.Type containerType = VertexStore.Type.List) {
+            _vertexStore = new VertexStore(containerType);
             _glyph = glyph;
-            _idx = 0;
             _zdepth = zdepth;
             _extrudedPoints = null;
             _sideFaces = new List<SideFace>();
@@ -166,54 +231,19 @@ namespace FontExtract {
             get => _tris.ToArray();
         }
 
-        public Type ContainerType {
-            get => _containType;
-            set {
-                _containType = value;
-                if (_containType == Type.Dict)
-                    _Migrate(_vert_l, _vert_d);
-                else
-                    _Migrate(_vert_d, _vert_l);
-            }
+        public VertexStore.Type ContainerType {
+            get => _vertexStore.ContainerType;
+            set => _vertexStore.ContainerType = value;
         }
 
-        public void Add(Point3 vertex) {
-            if (_containType == Type.Dict)
-                _vert_d[vertex] = ++_idx;
-            else
-                _vert_l.Add((vertex, ++_idx));
-        }
+        public void Add(Point3 vertex) => _vertexStore.Add(vertex);
 
-        public bool Contains(Point3 vertex) {
-            if (_containType == Type.Dict)
-                return _vert_d.ContainsKey(vertex);
-            try { return IndexOf(vertex) >= 0; }
-            catch (VertexNotFoundException) { return false; }
-        }
+        public bool Contains(Point3 vertex) => _vertexStore.Contains(vertex);
 
-        public int IndexOf(Point3 vertex) {
-            if (_containType == Type.Dict) {
-                try { return _vert_d[vertex]; }
-                catch (KeyNotFoundException) {
-                    throw new VertexNotFoundException(vertex);
-                }
-            }
-
-            foreach (var e in _vert_l)
-                if (vertex.EqualsEps(e.Point))
-                    return e.Index;
-            throw new VertexNotFoundException(vertex);
-        }
+        public int IndexOf(Point3 vertex) => _vertexStore.IndexOf(vertex);
 
         public IEnumerable<Point3> Vertices {
-            get {
-                if (_containType == Type.Dict)
-                    foreach (var entry in _vert_d.OrderBy(e => e.Value))
-                        yield return entry.Key;
-                else
-                    foreach (var entry in _vert_l)
-                        yield return entry.Point;
-            }
+            get => _vertexStore.Vertices;
         }
     }
 }
