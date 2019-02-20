@@ -122,15 +122,24 @@ namespace FontExtract {
 
     public class VertexCache {
         private RawGlyph _glyph;
-        private VertexStore _vertexStore;
         private int _zdepth;
         private Point3[] _extrudedPoints;
         private List<SideFace> _sideFaces;
+
+        private VertexStore _vertexStore;
+        private VertexStore _frontVertexStore;
+        private VertexStore _sideVertexStore;
+
         private List<Triangle3> _tris;
+        private List<Triangle3> _frontTris;
+        private List<Triangle3> _sideTris;
 
         private void _GatherMainOutline() {
-            foreach (var p in _glyph.Vertices())
-                Add(new Point3(p.X, p.Y, 0));
+            foreach (var p in _glyph.Vertices()) {
+                var vertex = new Point3(p.X, p.Y, 0);
+                _vertexStore.Add(vertex);
+                _frontVertexStore.Add(vertex);
+            }
         }
 
         private void _GatherFrontTessOutline() {
@@ -149,7 +158,8 @@ namespace FontExtract {
                     TessVertex2d extra = extras[i - oldVertLen];
                     var newPoint = new Point2( (float)extra.x, (float)extra.y);
                     vertices.Add(newPoint);
-                    Add(newPoint.ToPoint3());
+                    _vertexStore.Add(newPoint.ToPoint3());
+                    _frontVertexStore.Add(newPoint.ToPoint3());
                 }
                 else
                     vertices.Add(oldVerts[i]);
@@ -166,6 +176,7 @@ namespace FontExtract {
                 }.Front();
 
                 _tris.Add(frontTri.ToTriangle3());
+                _frontTris.Add(frontTri.ToTriangle3());
             }
         }
 
@@ -174,7 +185,10 @@ namespace FontExtract {
             var extPoints = 
                 Vertices.Select(p => Vector3.Transform(p, transl)).ToArray();
             _extrudedPoints = extPoints;
-            foreach (var p in extPoints) Add(p);
+            foreach (var p in extPoints) {
+                _vertexStore.Add(p);
+                _sideVertexStore.Add(p);
+            }
         }
 
         private void _GatherSideTess() {
@@ -202,24 +216,34 @@ namespace FontExtract {
                 Point3 firstFrontCorner = sideFace.PP1.P1;
                 Point3 oppositeBackCorner = sideFace.PP2.P2;
                 Point3 firstBackCorner = sideFace.PP1.P2;
-                _tris.Add(new Triangle3(
-                    firstFrontCorner, oppositeBackCorner, firstBackCorner));
+                var tri1 = new Triangle3(
+                    firstFrontCorner, oppositeBackCorner, firstBackCorner);
+                _tris.Add(tri1);
+                _sideTris.Add(tri1);
 
                 Point3 oppositeFrontCorner = sideFace.PP2.P1;
-                _tris.Add(new Triangle3(
-                    firstFrontCorner, oppositeFrontCorner, oppositeBackCorner));
+                var tri2 = new Triangle3(
+                    firstFrontCorner, oppositeFrontCorner, oppositeBackCorner);
+                _tris.Add(tri2);
+                _sideTris.Add(tri2);
             }
         }
 
         public VertexCache(
             RawGlyph glyph, int zdepth = 0, 
             VertexStore.Type containerType = VertexStore.Type.List) {
-            _vertexStore = new VertexStore(containerType);
             _glyph = glyph;
             _zdepth = zdepth;
             _extrudedPoints = null;
             _sideFaces = new List<SideFace>();
+
+            _vertexStore = new VertexStore(containerType);
+            _frontVertexStore = new VertexStore(containerType);
+            _sideVertexStore = new VertexStore(containerType);
+
             _tris = new List<Triangle3>();
+            _frontTris = new List<Triangle3>();
+            _sideTris = new List<Triangle3>();
 
             _GatherMainOutline();
             _GatherFrontTessOutline();
@@ -233,10 +257,12 @@ namespace FontExtract {
 
         public VertexStore.Type ContainerType {
             get => _vertexStore.ContainerType;
-            set => _vertexStore.ContainerType = value;
+            set {
+                _vertexStore.ContainerType = value;
+                _frontVertexStore.ContainerType = value;
+                _sideVertexStore.ContainerType = value;
+            }
         }
-
-        public void Add(Point3 vertex) => _vertexStore.Add(vertex);
 
         public bool Contains(Point3 vertex) => _vertexStore.Contains(vertex);
 
