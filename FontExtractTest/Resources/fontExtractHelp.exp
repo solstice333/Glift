@@ -20,4 +20,7 @@ optional arguments:
                                axis. Exit 1 if VALUE is a non-integer
   -y, --yoffset=VALUE        translate the model VALUE units across the y 
                                axis. Exit 1 if VALUE is a non-integer
+  -z, --zdepth=VALUE         depth of the extrusion VALUE units across the z 
+                               axis. Defaults to 50. Exit 1 if VALUE is a non-
+                               integer
   -h, --help                 show this message and exit
