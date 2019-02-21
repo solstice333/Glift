@@ -3,8 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 
-using Point2 = System.Numerics.Vector2;
-using Vec2 = System.Numerics.Vector2;
+using Point3 = System.Numerics.Vector3;
 
 using Typography.OpenFont;
 using Typography.Contours;
@@ -57,6 +56,26 @@ namespace FontExtract {
             }
         }
 
+        public static IEnumerable<Point3> VerticesOfFace(
+            VertexCache vertCache) {
+            if (Args.frontOnly)
+                return vertCache.Vertices(VertexCache.Face.Front);
+            else if (Args.sideOnly)
+                return vertCache.Vertices(VertexCache.Face.Side);
+            else
+                return vertCache.Vertices(VertexCache.Face.All);
+        }
+
+        public static IEnumerable<Triangle3> TrianglesOfFace(
+            VertexCache vertCache) {
+            if (Args.frontOnly)
+                return vertCache.Triangles(VertexCache.Face.Front);
+            else if (Args.sideOnly)
+                return vertCache.Triangles(VertexCache.Face.Side);
+            else
+                return vertCache.Triangles(VertexCache.Face.All);
+        }
+
         public static void Main(string[] args) {
             Args.Parse(args);
             Globals.allGlyphs = Args.chars.Count == 0;
@@ -80,9 +99,9 @@ namespace FontExtract {
 
                 tee?.Invoke($"# {g.Name}");
                 var vtxCache = new VertexCache(g, Args.zdepth);
-                foreach (var pt in vtxCache.Vertices)
+                foreach (var pt in VerticesOfFace(vtxCache))
                     tee?.Invoke($"v {pt.X} {pt.Y} {pt.Z}");
-                foreach (var tri in vtxCache.Triangles) {
+                foreach (var tri in TrianglesOfFace(vtxCache)) {
                     int vtxIdx1 = vtxCache.IndexOf(tri.P1);
                     int vtxIdx2 = vtxCache.IndexOf(tri.P2);
                     int vtxIdx3 = vtxCache.IndexOf(tri.P3);

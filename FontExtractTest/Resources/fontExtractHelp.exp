@@ -10,6 +10,8 @@ optional arguments:
                                Exit 1 if VALUE is not a single character. If 
                                not specified, defaults to all glyphs in the tt-
                                f. This can stack
+      --front-only           generate a .obj for the front face only
+      --side-only            generate a .obj for the side face only
   -l, --list-names           list glyph names
   -p, --print                print .obj to console
   -d, --dry-run              do not write to .obj. Useful with -p if printing 

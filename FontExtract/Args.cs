@@ -6,6 +6,8 @@ namespace FontExtract {
     static class Args {
         public static bool help = false;
         public static List<char> chars = new List<char>();
+        public static bool frontOnly = false;
+        public static bool sideOnly = false;
         public static int xoffset = 0;
         public static int yoffset = 0;
         public static int zdepth = -50;
@@ -31,6 +33,14 @@ namespace FontExtract {
                         chars.Add(v[0]);
                     }
                 }
+            },
+            {
+                "front-only", "generate a .obj for the front face only",
+                v => frontOnly = true
+            },
+            {
+                "side-only", "generate a .obj for the side face only",
+                v => sideOnly = true
             },
             {
                 "l|list-names", "list glyph names",

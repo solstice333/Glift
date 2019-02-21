@@ -95,6 +95,42 @@ namespace FontExtractTest {
             FileAssert.AreEqual(actual, expected);
         }
 
+        [Test]
+        public void AObjFrontTest() {
+            var actual = FileInThisBinDir("A.obj");
+            var expected = FileInResources("AFront.exp");
+            var ttf = TtfFile("Alef-Bold.ttf");
+            FontExtractRun($"-c A --front-only {ttf}");
+            FileAssert.AreEqual(actual, expected);
+        }
+
+        [Test]
+        public void SObjFrontTest() {
+            var actual = FileInThisBinDir("S.obj");
+            var expected = FileInResources("SFront.exp");
+            var ttf = TtfFile("Alef-Bold.ttf");
+            FontExtractRun($"-c S --front-only {ttf}");
+            FileAssert.AreEqual(actual, expected);
+        }
+
+        [Test]
+        public void AObjSideTest() {
+            var actual = FileInThisBinDir("A.obj");
+            var expected = FileInResources("ASide.exp");
+            var ttf = TtfFile("Alef-Bold.ttf");
+            FontExtractRun($"-c A --side-only {ttf}");
+            FileAssert.AreEqual(actual, expected);
+        }
+
+        [Test]
+        public void SObjSideTest() {
+            var actual = FileInThisBinDir("S.obj");
+            var expected = FileInResources("SSide.exp");
+            var ttf = TtfFile("Alef-Bold.ttf");
+            FontExtractRun($"-c S --side-only {ttf}");
+            FileAssert.AreEqual(actual, expected);
+        }
+
         [OneTimeTearDown]
         public void TearDownOnce() {
             File.Delete(FileInThisBinDir("A.obj"));

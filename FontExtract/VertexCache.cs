@@ -134,11 +134,16 @@ namespace FontExtract {
         private List<Triangle3> _frontTris;
         private List<Triangle3> _sideTris;
 
+        public enum Face {
+            Front, Side, All
+        }
+
         private void _GatherMainOutline() {
             foreach (var p in _glyph.Vertices()) {
                 var vertex = new Point3(p.X, p.Y, 0);
                 _vertexStore.Add(vertex);
                 _frontVertexStore.Add(vertex);
+                _sideVertexStore.Add(vertex);
             }
         }
 
@@ -183,7 +188,7 @@ namespace FontExtract {
         private void _GatherExtrudePoints() {
             var transl = Matrix4x4.CreateTranslation(0, 0, _zdepth);
             var extPoints = 
-                Vertices.Select(p => Vector3.Transform(p, transl)).ToArray();
+                Vertices(Face.Front).Select(p => Vector3.Transform(p, transl)).ToArray();
             _extrudedPoints = extPoints;
             foreach (var p in extPoints) {
                 _vertexStore.Add(p);
@@ -192,7 +197,7 @@ namespace FontExtract {
         }
 
         private void _GatherSideTess() {
-            Point3Pair[] pps = Vertices.Zip(_extrudedPoints, 
+            Point3Pair[] pps = Vertices(Face.Front).Zip(_extrudedPoints, 
                 (p1, p2) => new Point3Pair(p1, p2)).ToArray();
 
             int[] contourEnds;
@@ -251,10 +256,6 @@ namespace FontExtract {
             _GatherSideTess();
         }
 
-        public Triangle3[] Triangles {
-            get => _tris.ToArray();
-        }
-
         public VertexStore.Type ContainerType {
             get => _vertexStore.ContainerType;
             set {
@@ -264,12 +265,42 @@ namespace FontExtract {
             }
         }
 
-        public bool Contains(Point3 vertex) => _vertexStore.Contains(vertex);
-
-        public int IndexOf(Point3 vertex) => _vertexStore.IndexOf(vertex);
-
-        public IEnumerable<Point3> Vertices {
-            get => _vertexStore.Vertices;
+        public bool Contains(Point3 vertex, Face face = Face.All) {
+            if (face == Face.All)
+                return _vertexStore.Contains(vertex);
+            else if (face == Face.Front)
+                return _frontVertexStore.Contains(vertex);
+            else
+                return _sideVertexStore.Contains(vertex);
         }
+
+        public int IndexOf(Point3 vertex, Face face = Face.All) {
+            if (face == Face.All)
+                return _vertexStore.IndexOf(vertex);
+            else if (face == Face.Front)
+                return _frontVertexStore.IndexOf(vertex);
+            else
+                return _sideVertexStore.IndexOf(vertex);
+
+        }
+
+        public IEnumerable<Point3> Vertices(Face face = Face.All) {
+            if (face == Face.All)
+                return _vertexStore.Vertices;
+            else if (face == Face.Front)
+                return _frontVertexStore.Vertices;
+            else
+                return _sideVertexStore.Vertices;
+        }
+
+        public Triangle3[] Triangles(Face face = Face.All) {
+            if (face == Face.All)
+                return _tris.ToArray();
+            else if (face == Face.Front)
+                return _frontTris.ToArray();
+            else
+                return _sideTris.ToArray();
+        }
+
     }
 }
