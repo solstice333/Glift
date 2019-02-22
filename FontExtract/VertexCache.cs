@@ -27,28 +27,8 @@ namespace FontExtract {
         private List<Triangle3> _frontTris;
         private List<Triangle3> _sideTris;
 
-        private delegate void _VertexHandler(int currIdx, int contourStartIdx);
-
         public enum Face {
             Front, Side, All
-        }
-
-        private void _ForEachFrontVertex(
-            _VertexHandler onContourEnd, _VertexHandler onNonContourEnd) {
-            int[] contourEnds;
-            _glyph.Vertices(out contourEnds);
-
-            int start = 0;
-            int i = 0;
-            foreach (int contourEnd in contourEnds) {
-                for (i = start; i <= contourEnd; ++i) {
-                    if (i == contourEnd)
-                        onContourEnd?.Invoke(i, start);
-                    else
-                        onNonContourEnd?.Invoke(i, start);
-                }
-                start = i;
-            }
         }
 
         private void _GatherMainOutline() {
@@ -115,7 +95,7 @@ namespace FontExtract {
                 _extrudedPoints,
                 (p1, p2) => new Point3Pair(p1, p2)).ToArray();
 
-            _ForEachFrontVertex(
+            pps.Select(pp => pp.P1.ToPoint2XY()).ForEachVertex(_glyph,
                 (i, start) => {
                     if (pps[i] != pps[start])
                         _sideFaces.Add(new SideFace(pps[i], pps[start]));
@@ -147,23 +127,35 @@ namespace FontExtract {
             }
         }
 
+        private void _WrapPointsAroundAtContourEnd(
+            Point3[] verts, int currIdx, int startIdx,
+            out Point3 point1, out Point3 point2) {
+
+            try { point1 = verts[currIdx + 1]; }
+            catch (IndexOutOfRangeException) { point1 = verts[startIdx]; }
+
+            try { point2 = verts[currIdx + 2]; }
+            catch (IndexOutOfRangeException) { point2 = verts[startIdx + 1]; }
+        }
+
         private Arm[] _FoldFrontIntoArms() {
             var frontArms = new List<Arm>();
             Point3[] frontVerts = _frontVertexStore.Vertices.ToArray();
 
-            int i;
-            for (i = 0; i < frontVerts.Length; ++i) {
-                try {
-                    frontArms.Add(new Arm(
-                        new Point3Pair(frontVerts[i], frontVerts[i + 1]),
-                        new Point3Pair(frontVerts[i + 1], frontVerts[i + 2])
-                    ));
-                }
-                catch (IndexOutOfRangeException ie) {
-                    throw new NotImplementedException("", ie);
-                    // TODO: should actually have some sort of contour iterator 
-                }
-            }
+            frontVerts.Select(v => v.ToPoint2XY()).ForEachVertex(_glyph,
+                (i, start) => {
+                    Point3 p0 = frontVerts[i];
+                    Point3 p1, p2;
+                    _WrapPointsAroundAtContourEnd(
+                        frontVerts, i, start, out p1, out p2);
+
+                    if (!p0.EqualsEps(p1) && !p1.EqualsEps(p2))
+                        frontArms.Add(new Arm(
+                            new Point3Pair(p0, p1),
+                            new Point3Pair(p1, p2)
+                        ));
+                });
+
             return frontArms.ToArray();
         }
 
@@ -199,7 +191,7 @@ namespace FontExtract {
             _GatherFrontTessOutline();
             _GatherExtrudePoints();
             _GatherSideTess();
-            //_GatherPrismoidMainOutline();
+            _GatherPrismoidMainOutline();
         }
 
         public VertexStore.Type ContainerType {

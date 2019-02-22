@@ -99,6 +99,7 @@
     <Compile Include="PointExt.cs" />
     <Compile Include="SingleExt.cs" />
     <Compile Include="VertexStore.cs" />
+    <Compile Include="VertexIter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Util\" />
