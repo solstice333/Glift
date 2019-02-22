@@ -27,8 +27,28 @@ namespace FontExtract {
         private List<Triangle3> _frontTris;
         private List<Triangle3> _sideTris;
 
+        private delegate void _VertexHandler(int currIdx, int contourStartIdx);
+
         public enum Face {
             Front, Side, All
+        }
+
+        private void _ForEachFrontVertex(
+            _VertexHandler onContourEnd, _VertexHandler onNonContourEnd) {
+            int[] contourEnds;
+            _glyph.Vertices(out contourEnds);
+
+            int start = 0;
+            int i = 0;
+            foreach (int contourEnd in contourEnds) {
+                for (i = start; i <= contourEnd; ++i) {
+                    if (i == contourEnd)
+                        onContourEnd?.Invoke(i, start);
+                    else
+                        onNonContourEnd?.Invoke(i, start);
+                }
+                start = i;
+            }
         }
 
         private void _GatherMainOutline() {
@@ -90,32 +110,12 @@ namespace FontExtract {
             }
         }
 
-        private delegate void _VertexHandler(int currIdx, int contourStartIdx);
-
-        private void ForEachFrontVertex(
-            _VertexHandler onContourEnd, _VertexHandler onNonContourEnd) {
-            int[] contourEnds;
-            _glyph.Vertices(out contourEnds);
-
-            int start = 0;
-            int i = 0;
-            foreach (int contourEnd in contourEnds) {
-                for (i = start; i <= contourEnd; ++i) {
-                    if (i == contourEnd)
-                        onContourEnd?.Invoke(i, start);
-                    else
-                        onNonContourEnd?.Invoke(i, start);
-                }
-                start = i;
-            }
-        }
-
         private void _PopulateSideFaces() {
             Point3Pair[] pps = Vertices(Face.Front).Zip(
                 _extrudedPoints,
                 (p1, p2) => new Point3Pair(p1, p2)).ToArray();
 
-            ForEachFrontVertex(
+            _ForEachFrontVertex(
                 (i, start) => {
                     if (pps[i] != pps[start])
                         _sideFaces.Add(new SideFace(pps[i], pps[start]));
