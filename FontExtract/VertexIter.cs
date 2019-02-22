@@ -6,7 +6,8 @@ using Point2 = System.Numerics.Vector2;
 
 namespace FontExtract {
     public static class VertexIter {
-        public delegate void VertexHandler(int currIdx, int contourStartIdx);
+        public delegate void VertexHandler(
+            int currIdx, int contourStartIdx, int contourEndIdx);
 
         public static int[] normalizeContourEnds(
             this IEnumerable<Point2> verts, RawGlyph glyph) {
@@ -30,9 +31,9 @@ namespace FontExtract {
             foreach (int contourEnd in contourEnds) {
                 for (i = start; i <= contourEnd; ++i) {
                     if (i == contourEnd)
-                        onContourEnd?.Invoke(i, start);
+                        onContourEnd?.Invoke(i, start, contourEnd);
                     else
-                        onNonContourEnd?.Invoke(i, start);
+                        onNonContourEnd?.Invoke(i, start, contourEnd);
                 }
                 start = i;
             }

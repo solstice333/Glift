@@ -96,11 +96,11 @@ namespace FontExtract {
                 (p1, p2) => new Point3Pair(p1, p2)).ToArray();
 
             pps.Select(pp => pp.P1.ToPoint2XY()).ForEachVertex(_glyph,
-                (i, start) => {
+                (i, start, end) => {
                     if (pps[i] != pps[start])
                         _sideFaces.Add(new SideFace(pps[i], pps[start]));
                 },
-                (i, start) => {
+                (i, start, end) => {
                     if (pps[i] != pps[i + 1])
                         _sideFaces.Add(new SideFace(pps[i], pps[i + 1]));
                 }
@@ -128,13 +128,21 @@ namespace FontExtract {
         }
 
         private void _WrapPointsAroundAtContourEnd(
-            Point3[] verts, int currIdx, int startIdx,
+            Point3[] verts, int currIdx, int startIdx, int contourEndIdx,
             out Point3 point1, out Point3 point2) {
 
-            try { point1 = verts[currIdx + 1]; }
+            try {
+                if (currIdx + 1 > contourEndIdx)
+                    throw new IndexOutOfRangeException();
+                point1 = verts[currIdx + 1]; 
+            }
             catch (IndexOutOfRangeException) { point1 = verts[startIdx]; }
 
-            try { point2 = verts[currIdx + 2]; }
+            try {
+                if (currIdx + 2 > contourEndIdx)
+                    throw new IndexOutOfRangeException();
+                point2 = verts[currIdx + 2]; 
+            }
             catch (IndexOutOfRangeException) { point2 = verts[startIdx + 1]; }
         }
 
@@ -143,11 +151,11 @@ namespace FontExtract {
             Point3[] frontVerts = _frontVertexStore.Vertices.ToArray();
 
             frontVerts.Select(v => v.ToPoint2XY()).ForEachVertex(_glyph,
-                (i, start) => {
+                (i, start, end) => {
                     Point3 p0 = frontVerts[i];
                     Point3 p1, p2;
                     _WrapPointsAroundAtContourEnd(
-                        frontVerts, i, start, out p1, out p2);
+                        frontVerts, i, start, end, out p1, out p2);
 
                     if (!p0.EqualsEps(p1) && !p1.EqualsEps(p2))
                         frontArms.Add(new Arm(
