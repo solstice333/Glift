@@ -96,6 +96,15 @@ namespace FontExtractTest {
         }
 
         [Test]
+        public void BObjTest() {
+            var actual = FileInThisBinDir("B.obj");
+            var expected = FileInResources("B.exp");
+            var ttf = TtfFile("Alef-Bold.ttf");
+            FontExtractRun($"-c B {ttf}");
+            FileAssert.AreEqual(actual, expected);
+        }
+
+        [Test]
         public void AObjFrontTest() {
             var actual = FileInThisBinDir("A.obj");
             var expected = FileInResources("AFront.exp");
@@ -114,6 +123,15 @@ namespace FontExtractTest {
         }
 
         [Test]
+        public void BObjFrontTest() {
+            var actual = FileInThisBinDir("B.obj");
+            var expected = FileInResources("BFront.exp");
+            var ttf = TtfFile("Alef-Bold.ttf");
+            FontExtractRun($"-c B --front-only {ttf}");
+            FileAssert.AreEqual(actual, expected);
+        }
+
+        [Test]
         public void AObjSideTest() {
             var actual = FileInThisBinDir("A.obj");
             var expected = FileInResources("ASide.exp");
@@ -128,6 +146,15 @@ namespace FontExtractTest {
             var expected = FileInResources("SSide.exp");
             var ttf = TtfFile("Alef-Bold.ttf");
             FontExtractRun($"-c S --side-only {ttf}");
+            FileAssert.AreEqual(actual, expected);
+        }
+
+        [Test]
+        public void BObjSideTest() {
+            var actual = FileInThisBinDir("B.obj");
+            var expected = FileInResources("BSide.exp");
+            var ttf = TtfFile("Alef-Bold.ttf");
+            FontExtractRun($"-c B --side-only {ttf}");
             FileAssert.AreEqual(actual, expected);
         }
 
