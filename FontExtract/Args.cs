@@ -11,6 +11,7 @@ namespace FontExtract {
         public static int xoffset = 0;
         public static int yoffset = 0;
         public static int zdepth = -50;
+        public static int thickness = 20;
         public static string ttfPath = "";
         public static float sizePt = 300f;
         public static bool listNames = false;
@@ -86,6 +87,13 @@ namespace FontExtract {
                 v => {
                     help = !int.TryParse(v, out zdepth);
                     zdepth = -zdepth;
+                    exst = help ? 1 : 0;
+                }
+            },
+            {
+                "t|thickness-outline", "thickness of outline in VALUE units",
+                v => {
+                    help = !int.TryParse(v, out thickness);
                     exst = help ? 1 : 0;
                 }
             },

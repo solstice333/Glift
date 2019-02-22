@@ -93,6 +93,12 @@
     <Compile Include="Triangle3.cs" />
     <Compile Include="SideFace.cs" />
     <Compile Include="Point3Pair.cs" />
+    <Compile Include="Arm.cs" />
+    <Compile Include="Vector2Ext.cs" />
+    <Compile Include="CustomExceptions.cs" />
+    <Compile Include="PointExt.cs" />
+    <Compile Include="SingleExt.cs" />
+    <Compile Include="VertexStore.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Util\" />

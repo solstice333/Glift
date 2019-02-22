@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using Tesselate;
@@ -10,124 +11,16 @@ using Point3 = System.Numerics.Vector3;
 using Util;
 
 namespace FontExtract {
-    using VCacheList = List<(Point3 Point, int Index)>;
-    using VCacheDict = Dictionary<Point3, int>;
-
-    public static class PointExt {
-        public static float Epsilon = 0.001f;
-
-        public static bool EqualsEps(this Point3 p1, Point3 p2) {
-            return p1.X > p2.X - Epsilon && p1.X < p2.X + Epsilon &&
-                p1.Y > p2.Y - Epsilon && p1.Y < p2.Y + Epsilon &&
-                p1.Z > p2.Z - Epsilon && p1.Z < p2.Z + Epsilon;
-        }
-
-        public static Point2 ToPoint2(this Point3 p) {
-            return new Point2(p.X, p.Y);
-        }
-
-        public static Point3 ToPoint3(this Point2 p, float z = 0) {
-            return new Point3(p.X, p.Y, z);
-        }
-    }
-
-    public class VertexNotFoundException : KeyNotFoundException {
-        public VertexNotFoundException(Point3 point, Exception e = null) :
-            base($"vertex {point} not found", e) { }
-    }
-
-
-    public class VertexStore {
-        private VCacheDict _vert_d;
-        private VCacheList _vert_l;
-        private Type _containType;
-        private int _idx;
-
-        public enum Type { List, Dict }
-
-        private void _MigrateToDict() {
-            if (_containType == Type.Dict)
-                return;
-            foreach (var entry in _vert_l)
-                _vert_d[entry.Point] = entry.Index;
-            _vert_l.Clear();
-            _containType = Type.Dict;
-        }
-
-        private void _MigrateToList() {
-            if (_containType == Type.List)
-                return;
-            foreach (var entry in _vert_d.OrderBy(e => e.Value))
-                _vert_l.Add((entry.Key, entry.Value));
-            _vert_d.Clear();
-            _containType = Type.List;
-        }
-
-        public VertexStore(Type containType = Type.List) {
-            _containType = containType;
-            _idx = 0;
-            _vert_d = new VCacheDict();
-            _vert_l = new VCacheList();
-        }
-
-        public VertexStore.Type ContainerType {
-            get => _containType;
-            set {
-                if (value == Type.List)
-                    _MigrateToList();
-                else
-                    _MigrateToDict();
-            }
-        }
-
-        public void Add(Point3 vertex) {
-            if (_containType == Type.Dict)
-                _vert_d[vertex] = ++_idx;
-            else
-                _vert_l.Add((vertex, ++_idx));
-        }
-
-        public bool Contains(Point3 vertex) {
-            if (_containType == Type.Dict)
-                return _vert_d.ContainsKey(vertex);
-            try { return IndexOf(vertex) >= 0; }
-            catch (VertexNotFoundException) { return false; }
-        }
-
-        public int IndexOf(Point3 vertex) {
-            if (_containType == Type.Dict) {
-                try { return _vert_d[vertex]; }
-                catch (KeyNotFoundException) {
-                    throw new VertexNotFoundException(vertex);
-                }
-            }
-
-            foreach (var e in _vert_l)
-                if (vertex.EqualsEps(e.Point))
-                    return e.Index;
-            throw new VertexNotFoundException(vertex);
-        }
-
-        public IEnumerable<Point3> Vertices {
-            get {
-                if (_containType == Type.Dict)
-                    foreach (var entry in _vert_d.OrderBy(e => e.Value))
-                        yield return entry.Key;
-                else
-                    foreach (var entry in _vert_l)
-                        yield return entry.Point;
-            }
-        }
-    }
-
     public class VertexCache {
         private RawGlyph _glyph;
         private int _zdepth;
         private Point3[] _extrudedPoints;
         private List<SideFace> _sideFaces;
+        private int _thickness;
 
         private VertexStore _vertexStore;
         private VertexStore _frontVertexStore;
+        private VertexStore _frontSkeletonVertexStore;
         private VertexStore _sideVertexStore;
 
         private List<Triangle3> _tris;
@@ -144,6 +37,7 @@ namespace FontExtract {
                 _vertexStore.Add(vertex);
                 _frontVertexStore.Add(vertex);
                 _sideVertexStore.Add(vertex);
+                _frontSkeletonVertexStore.Add(vertex);
             }
         }
 
@@ -196,10 +90,10 @@ namespace FontExtract {
             }
         }
 
-        private void _GatherSideTess() {
-            Point3Pair[] pps = Vertices(Face.Front).Zip(_extrudedPoints, 
-                (p1, p2) => new Point3Pair(p1, p2)).ToArray();
+        private delegate void _VertexHandler(int currIdx, int contourStartIdx);
 
+        private void ForEachFrontVertex(
+            _VertexHandler onContourEnd, _VertexHandler onNonContourEnd) {
             int[] contourEnds;
             _glyph.Vertices(out contourEnds);
 
@@ -207,15 +101,34 @@ namespace FontExtract {
             int i = 0;
             foreach (int contourEnd in contourEnds) {
                 for (i = start; i <= contourEnd; ++i) {
-                    if (i == contourEnd) {
-                        if (pps[i] != pps[start])
-                            _sideFaces.Add(new SideFace(pps[i], pps[start]));
-                    }
-                    else if (pps[i] != pps[i + 1])
-                        _sideFaces.Add(new SideFace(pps[i], pps[i + 1]));
+                    if (i == contourEnd)
+                        onContourEnd?.Invoke(i, start);
+                    else
+                        onNonContourEnd?.Invoke(i, start);
                 }
                 start = i;
             }
+        }
+
+        private void _PopulateSideFaces() {
+            Point3Pair[] pps = Vertices(Face.Front).Zip(
+                _extrudedPoints,
+                (p1, p2) => new Point3Pair(p1, p2)).ToArray();
+
+            ForEachFrontVertex(
+                (i, start) => {
+                    if (pps[i] != pps[start])
+                        _sideFaces.Add(new SideFace(pps[i], pps[start]));
+                },
+                (i, start) => {
+                    if (pps[i] != pps[i + 1])
+                        _sideFaces.Add(new SideFace(pps[i], pps[i + 1]));
+                }
+            );
+        }
+
+        private void _GatherSideTess() {
+            _PopulateSideFaces();
 
             foreach (var sideFace in _sideFaces) {
                 Point3 firstFrontCorner = sideFace.PP1.P1;
@@ -234,17 +147,49 @@ namespace FontExtract {
             }
         }
 
+        private Arm[] _FoldFrontIntoArms() {
+            var frontArms = new List<Arm>();
+            Point3[] frontVerts = _frontVertexStore.Vertices.ToArray();
+
+            int i;
+            for (i = 0; i < frontVerts.Length; ++i) {
+                try {
+                    frontArms.Add(new Arm(
+                        new Point3Pair(frontVerts[i], frontVerts[i + 1]),
+                        new Point3Pair(frontVerts[i + 1], frontVerts[i + 2])
+                    ));
+                }
+                catch (IndexOutOfRangeException ie) {
+                    throw new NotImplementedException("", ie);
+                    // TODO: should actually have some sort of contour iterator 
+                }
+            }
+            return frontArms.ToArray();
+        }
+
+        private void _GatherPrismoidMainOutline() {
+            Arm[] frontArms = _FoldFrontIntoArms();
+            int halfDist = _thickness / 2;
+            double diag = Math.Sqrt(halfDist * halfDist + halfDist * halfDist);
+            foreach (var arm in frontArms) {
+                Vector2 upper = arm.UpperVec2XYSafe;
+                Vector2 lower = arm.LowerVec2XYSafe;
+            }
+        }
+
         public VertexCache(
-            RawGlyph glyph, int zdepth = 0, 
+            RawGlyph glyph, int zdepth = 0, int thickness = 0,
             VertexStore.Type containerType = VertexStore.Type.List) {
             _glyph = glyph;
             _zdepth = zdepth;
             _extrudedPoints = null;
             _sideFaces = new List<SideFace>();
+            _thickness = thickness;
 
             _vertexStore = new VertexStore(containerType);
             _frontVertexStore = new VertexStore(containerType);
             _sideVertexStore = new VertexStore(containerType);
+            _frontSkeletonVertexStore = new VertexStore(containerType);
 
             _tris = new List<Triangle3>();
             _frontTris = new List<Triangle3>();
@@ -254,6 +199,7 @@ namespace FontExtract {
             _GatherFrontTessOutline();
             _GatherExtrudePoints();
             _GatherSideTess();
+            //_GatherPrismoidMainOutline();
         }
 
         public VertexStore.Type ContainerType {
@@ -262,6 +208,7 @@ namespace FontExtract {
                 _vertexStore.ContainerType = value;
                 _frontVertexStore.ContainerType = value;
                 _sideVertexStore.ContainerType = value;
+                _frontSkeletonVertexStore.ContainerType = value;
             }
         }
 

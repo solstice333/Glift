@@ -41,6 +41,14 @@ namespace FontExtract {
             set => _contourEnds = value ?? new int[] { };
         }
 
+        public Point2[] ContourEndsAsPoint2 {
+            get {
+                int[] contourEnds;
+                Point2[] vertices = Vertices(out contourEnds);
+                return contourEnds.Select(i => vertices[i]).ToArray();
+            }
+        }
+
         public RawGlyph() {
             _name = "";
             _glyphPts = new float[] { };
