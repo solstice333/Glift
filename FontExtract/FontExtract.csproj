@@ -101,6 +101,7 @@
     <Compile Include="VertexStore.cs" />
     <Compile Include="VertexIter.cs" />
     <Compile Include="Prismoid.cs" />
+    <Compile Include="Square.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Util\" />

@@ -29,6 +29,8 @@ namespace FontExtract {
 
         private Arm[] _frontArms;
 
+        private delegate void _AddTri(Triangle3 t);
+
         public enum Face {
             Front, Side, All
         }
@@ -187,6 +189,54 @@ namespace FontExtract {
             }
         }
 
+        private void _GatherPrismoidMainOutlineTess() {
+            foreach (var arm in _frontArms) {
+                Prismoid upperPrismoid = arm.UpperPrismoid;
+                Prismoid lowerPrismoid = arm.LowerPrismoid;
+
+                var sqUpper1 = 
+                    new Square(upperPrismoid.PointsCWStartUpperLeft);
+                var sqUpper2 = 
+                    new Square(upperPrismoid.PointsCWStartUpperLeft.Skip(4));
+                var sqLower1 = 
+                    new Square(lowerPrismoid.PointsCWStartUpperLeft);
+                var sqLower2 = 
+                    new Square(lowerPrismoid.PointsCWStartUpperLeft.Skip(4));
+
+                var tessaTop1 = new Triangle3(sqUpper1.UpLeft, 
+                    sqUpper1.UpRight, sqUpper2.UpRight);
+                var tessaTop2 = new Triangle3(sqUpper1.UpLeft,
+                    sqUpper2.UpRight, sqUpper2.UpLeft);
+
+                var tessaRight1 = new Triangle3(sqUpper1.UpRight,
+                    sqUpper2.DownRight, sqUpper2.UpRight);
+                var tessaRight2 = new Triangle3(sqUpper1.UpRight,
+                    sqUpper1.DownRight, sqUpper2.DownRight);
+
+                var tessaBottom1 = new Triangle3(sqUpper1.DownLeft,
+                    sqUpper2.DownLeft, sqUpper2.DownRight);
+                var tessaBottom2 = new Triangle3(sqUpper1.DownLeft,
+                    sqUpper2.DownRight, sqUpper1.DownRight);
+
+                var tessaLeft1 = new Triangle3(sqUpper1.UpLeft,
+                    sqUpper2.UpLeft, sqUpper2.DownLeft);
+                var tessaLeft2 = new Triangle3(sqUpper1.UpLeft,
+                    sqUpper2.DownLeft, sqUpper1.DownLeft);
+
+                _AddTri addTri = _tris.Add;
+                addTri += _frontTris.Add;
+
+                addTri(tessaTop1);
+                addTri(tessaTop2);
+                addTri(tessaRight1);
+                addTri(tessaRight2);
+                addTri(tessaBottom1);
+                addTri(tessaBottom2);
+                addTri(tessaLeft1);
+                addTri(tessaLeft2);
+            }
+        }
+
         public VertexCache(
             RawGlyph glyph, int zdepth = 0, int thickness = 0,
             VertexStore.Type containerType = VertexStore.Type.List) {
@@ -212,6 +262,7 @@ namespace FontExtract {
             _GatherExtrudePoints();
             _GatherSideTess();
             _GatherPrismoidMainOutline();
+            _GatherPrismoidMainOutlineTess();
         }
 
         public VertexStore.Type ContainerType {
