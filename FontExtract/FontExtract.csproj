@@ -100,6 +100,7 @@
     <Compile Include="SingleExt.cs" />
     <Compile Include="VertexStore.cs" />
     <Compile Include="VertexIter.cs" />
+    <Compile Include="Prismoid.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Util\" />

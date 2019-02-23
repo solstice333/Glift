@@ -37,11 +37,17 @@ namespace FontExtract {
             },
             {
                 "front-only", "generate a .obj for the front face only",
-                v => frontOnly = true
+                v => {
+                    frontOnly = true;
+                    sideOnly = false;
+                }
             },
             {
                 "side-only", "generate a .obj for the side face only",
-                v => sideOnly = true
+                v => {
+                    sideOnly = true;
+                    frontOnly = false;
+                }
             },
             {
                 "l|list-names", "list glyph names",

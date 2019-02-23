@@ -27,6 +27,8 @@ namespace FontExtract {
         private List<Triangle3> _frontTris;
         private List<Triangle3> _sideTris;
 
+        private Arm[] _frontArms;
+
         public enum Face {
             Front, Side, All
         }
@@ -82,7 +84,8 @@ namespace FontExtract {
         private void _GatherExtrudePoints() {
             var transl = Matrix4x4.CreateTranslation(0, 0, _zdepth);
             var extPoints = 
-                Vertices(Face.Front).Select(p => Vector3.Transform(p, transl)).ToArray();
+                Vertices(Face.Front).Select(
+                    p => Vector3.Transform(p, transl)).ToArray();
             _extrudedPoints = extPoints;
             foreach (var p in extPoints) {
                 _vertexStore.Add(p);
@@ -160,7 +163,8 @@ namespace FontExtract {
                     if (!p0.EqualsEps(p1) && !p1.EqualsEps(p2))
                         frontArms.Add(new Arm(
                             new Point3Pair(p0, p1),
-                            new Point3Pair(p1, p2)
+                            new Point3Pair(p1, p2),
+                            _thickness
                         ));
                 });
 
@@ -168,12 +172,18 @@ namespace FontExtract {
         }
 
         private void _GatherPrismoidMainOutline() {
-            Arm[] frontArms = _FoldFrontIntoArms();
-            int halfDist = _thickness / 2;
-            double diag = Math.Sqrt(halfDist * halfDist + halfDist * halfDist);
-            foreach (var arm in frontArms) {
-                Vector2 upper = arm.UpperVec2XYSafe;
-                Vector2 lower = arm.LowerVec2XYSafe;
+            _frontArms = _FoldFrontIntoArms();
+            foreach (var arm in _frontArms) {
+                Prismoid upperPrismoid = arm.UpperPrismoid;
+                Prismoid lowerPrismoid = arm.LowerPrismoid;
+                foreach (Point3 p in upperPrismoid.PointsCWStartUpperLeft) {
+                    _vertexStore.Add(p);
+                    _frontVertexStore.Add(p);
+                }
+                foreach (Point3 p in lowerPrismoid.PointsCWStartUpperLeft) {
+                    _vertexStore.Add(p);
+                    _frontVertexStore.Add(p);
+                }
             }
         }
 
@@ -194,6 +204,8 @@ namespace FontExtract {
             _tris = new List<Triangle3>();
             _frontTris = new List<Triangle3>();
             _sideTris = new List<Triangle3>();
+
+            _frontArms = null;
 
             _GatherMainOutline();
             _GatherFrontTessOutline();

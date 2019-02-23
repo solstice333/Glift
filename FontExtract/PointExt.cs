@@ -21,5 +21,9 @@ namespace FontExtract {
         public static Point3 ToPoint3(this Point2 p, float z = 0) {
             return new Point3(p.X, p.Y, z);
         }
+
+        public static bool IsPoint2DXY(this Point3 p) {
+            return p.Z.EqualsEps(0f);
+        }
     }
 }

@@ -4,6 +4,12 @@ using Point3 = System.Numerics.Vector3;
 
 namespace FontExtract {
     public struct Arm {
+        private Point3Pair _upperSegment;
+        private Point3Pair _lowerSegment;
+        private Prismoid _upperPrismoid;
+        private Prismoid _lowerPrismoid;
+        private int _thickness;
+
         private void _AssertUpperVecIsXY2D() {
             if (!UpperSegment.P1.Z.EqualsEps(0) ||
                 !UpperSegment.P2.Z.EqualsEps(0))
@@ -29,8 +35,46 @@ namespace FontExtract {
             return UpperSegment.P2.ToPoint2XY() - UpperSegment.P1.ToPoint2XY();
         }
 
-        public Point3Pair UpperSegment { get; set; }
-        public Point3Pair LowerSegment { get; set; }
+        public int Thickness {
+            get => _thickness;
+            set {
+                _thickness = value;
+                _upperPrismoid = null;
+                _lowerPrismoid = null;
+            }
+        }
+
+        public Point3Pair UpperSegment {
+            get => _upperSegment;
+            set {
+                _upperSegment = value;
+                _upperPrismoid = null; 
+            }
+        }
+
+        public Point3Pair LowerSegment {
+            get => _lowerSegment;
+            set {
+                _lowerSegment = value;
+                _lowerPrismoid = null;
+            }
+        }
+
+        public Prismoid UpperPrismoid { 
+            get {
+                if (_upperPrismoid == null)
+                    _upperPrismoid = new Prismoid(UpperSegment, Thickness);
+                return _upperPrismoid;
+            }
+        }
+
+        public Prismoid LowerPrismoid {
+            get {
+                if (_lowerPrismoid == null)
+                    _lowerPrismoid = new Prismoid(LowerSegment, Thickness);
+                return _lowerPrismoid;
+            }
+        }
 
         public Vector2 LowerVec2XY {
             get => _LowerVec2XY();
@@ -48,9 +92,13 @@ namespace FontExtract {
             get => _UpperVec2XY(true);
         }
 
-        public Arm(Point3Pair upperSegment, Point3Pair lowerSegment) {
-            UpperSegment = upperSegment;
-            LowerSegment = lowerSegment;
+        public Arm(
+            Point3Pair upperSegment, Point3Pair lowerSegment, int thickness) {
+            _upperSegment = upperSegment;
+            _lowerSegment = lowerSegment;
+            _thickness = thickness;
+            _upperPrismoid = null;
+            _lowerPrismoid = null;
         }
 
         public override string ToString() {
