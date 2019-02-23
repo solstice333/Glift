@@ -28,5 +28,9 @@ namespace FontExtract {
             DownRight = pointsArr[2];
             DownLeft = pointsArr[3];
         }
+
+        public override string ToString() {
+            return $"({UpLeft},{UpRight},{DownRight},{DownLeft})";
+        }
     }
 }

@@ -18,6 +18,37 @@ namespace FontExtract {
         public static bool allGlyphs = false;
     }
 
+    static class VertexCacheExt {
+        public static IEnumerable<Point3> VerticesOfFace(
+            this VertexCache vertCache) {
+            if (Args.frontOnly)
+                return vertCache.Vertices(VertexCache.Face.Front);
+            else if (Args.sideOnly)
+                return vertCache.Vertices(VertexCache.Face.Side);
+            else
+                return vertCache.Vertices(VertexCache.Face.All);
+        }
+
+        public static IEnumerable<Triangle3> TrianglesOfFace(
+            this VertexCache vertCache) {
+            if (Args.frontOnly)
+                return vertCache.Triangles(VertexCache.Face.Front);
+            else if (Args.sideOnly)
+                return vertCache.Triangles(VertexCache.Face.Side);
+            else
+                return vertCache.Triangles(VertexCache.Face.All);
+        }
+
+        public static int IndexOfFace(this VertexCache vertCache, Point3 p) {
+            if (Args.frontOnly)
+                return vertCache.IndexOf(p, VertexCache.Face.Front);
+            else if (Args.sideOnly)
+                return vertCache.IndexOf(p, VertexCache.Face.Side);
+            else
+                return vertCache.IndexOf(p, VertexCache.Face.All);
+        }
+    }
+
     class MainClass {
         public delegate void WriteLine(string msg = "");
 
@@ -56,26 +87,6 @@ namespace FontExtract {
             }
         }
 
-        public static IEnumerable<Point3> VerticesOfFace(
-            VertexCache vertCache) {
-            if (Args.frontOnly)
-                return vertCache.Vertices(VertexCache.Face.Front);
-            else if (Args.sideOnly)
-                return vertCache.Vertices(VertexCache.Face.Side);
-            else
-                return vertCache.Vertices(VertexCache.Face.All);
-        }
-
-        public static IEnumerable<Triangle3> TrianglesOfFace(
-            VertexCache vertCache) {
-            if (Args.frontOnly)
-                return vertCache.Triangles(VertexCache.Face.Front);
-            else if (Args.sideOnly)
-                return vertCache.Triangles(VertexCache.Face.Side);
-            else
-                return vertCache.Triangles(VertexCache.Face.All);
-        }
-
         public static void Main(string[] args) {
             Args.Parse(args);
             Globals.allGlyphs = Args.chars.Count == 0;
@@ -99,12 +110,12 @@ namespace FontExtract {
 
                 tee?.Invoke($"# {g.Name}");
                 var vtxCache = new VertexCache(g, Args.zdepth, Args.thickness);
-                foreach (var pt in VerticesOfFace(vtxCache))
+                foreach (var pt in vtxCache.VerticesOfFace())
                     tee?.Invoke($"v {pt.X} {pt.Y} {pt.Z}");
-                foreach (var tri in TrianglesOfFace(vtxCache)) {
-                    int vtxIdx1 = vtxCache.IndexOf(tri.P1);
-                    int vtxIdx2 = vtxCache.IndexOf(tri.P2);
-                    int vtxIdx3 = vtxCache.IndexOf(tri.P3);
+                foreach (var tri in vtxCache.TrianglesOfFace()) {
+                    int vtxIdx1 = vtxCache.IndexOfFace(tri.P1);
+                    int vtxIdx2 = vtxCache.IndexOfFace(tri.P2);
+                    int vtxIdx3 = vtxCache.IndexOfFace(tri.P3);
                     tee?.Invoke($"f {vtxIdx1} {vtxIdx2} {vtxIdx3}");
                 }
                 tee?.Invoke();
