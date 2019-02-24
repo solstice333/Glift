@@ -158,6 +158,33 @@ namespace FontExtractTest {
             FileAssert.AreEqual(actual, expected);
         }
 
+        [Test]
+        public void ABSObjXYOffsetFrontSideTest() {
+            var actualASide = FileInThisBinDir("ASideOnly.obj");
+            var expectedASide = FileInResources("ASideOnly.exp");
+            var actualBSide = FileInThisBinDir("BSideOnly.obj");
+            var expectedBSide = FileInResources("BSideOnly.exp");
+            var actualSSide = FileInThisBinDir("SSideOnly.obj");
+            var expectedSSide = FileInResources("SSideOnly.exp");
+
+            var actualAFront = FileInThisBinDir("AFrontOnly.obj");
+            var expectedAFront = FileInResources("AFrontOnly.exp");
+            var actualBFront = FileInThisBinDir("BFrontOnly.obj");
+            var expectedBFront = FileInResources("BFrontOnly.exp");
+            var actualSFront = FileInThisBinDir("SFrontOnly.obj");
+            var expectedSFront = FileInResources("SFrontOnly.exp");
+
+            var ttf = TtfFile("Alef-Bold.ttf");
+            FontExtractRun($"-c B -c A -c S --front-only --side-only {ttf}");
+
+            FileAssert.AreEqual(actualASide, expectedASide);
+            FileAssert.AreEqual(actualBSide, expectedBSide);
+            FileAssert.AreEqual(actualSSide, expectedSSide);
+            FileAssert.AreEqual(actualAFront, expectedAFront);
+            FileAssert.AreEqual(actualBFront, expectedBFront);
+            FileAssert.AreEqual(actualSFront, expectedSFront);
+        }
+
         [OneTimeTearDown]
         public void TearDownOnce() {
             File.Delete(FileInThisBinDir("A.obj"));

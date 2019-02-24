@@ -38,8 +38,18 @@ namespace FontExtract {
             Front, Side, All
         }
 
+        private IEnumerable<Point3> _NonTranslatedVertices(
+            Face face = Face.All) {
+            if (face == Face.All)
+                return _vertexStore.Vertices;
+            else if (face == Face.Front)
+                return _frontVertexStore.Vertices;
+            else
+                return _sideVertexStore.Vertices;
+        }
+
         private void _PopulateSideFaces() {
-            Point3Pair[] pps = Vertices(Face.Front).Zip(
+            Point3Pair[] pps = _NonTranslatedVertices(Face.Front).Zip(
                 _extrudedPoints,
                 (p1, p2) => new Point3Pair(p1, p2)).ToArray();
 
@@ -150,10 +160,10 @@ namespace FontExtract {
 
             var transl = Matrix4x4.CreateTranslation(0, 0, _zdepth);
             var extPoints = 
-                Vertices(Face.Front).Select(
+                _NonTranslatedVertices(Face.Front).Select(
                     p => Vector3.Transform(p, transl)).ToArray();
             _extrudedPoints = extPoints;
-            foreach (var p in extPoints) {
+            foreach (Point3 p in extPoints) {
                 _vertexStore.Add(p);
                 _sideVertexStore.Add(p);
             }
@@ -309,24 +319,23 @@ namespace FontExtract {
 
         public IEnumerable<Point3> Vertices(Face face = Face.All) {
             if (face == Face.All)
-                return _vertexStore.Vertices.Select(
+                return _NonTranslatedVertices(Face.All).Select(
                     p => Vector3.Transform(p, _transl));
             else if (face == Face.Front)
-                return _frontVertexStore.Vertices.Select(
+                return _NonTranslatedVertices(Face.Front).Select(
                     p => Vector3.Transform(p, _transl));
             else
-                return _sideVertexStore.Vertices.Select(
+                return _NonTranslatedVertices(Face.Side).Select(
                     p => Vector3.Transform(p, _transl));
         }
 
-        public Triangle3[] Triangles(Face face = Face.All) {
+        public IEnumerable<Triangle3> Triangles(Face face = Face.All) {
             if (face == Face.All)
-                return _tris.ToArray();
+                return _tris;
             else if (face == Face.Front)
-                return _frontTris.ToArray();
+                return _frontTris;
             else
-                return _sideTris.ToArray();
+                return _sideTris;
         }
-
     }
 }
