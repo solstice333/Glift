@@ -109,7 +109,8 @@ namespace FontExtract {
                 }
 
                 tee?.Invoke($"# {g.Name}");
-                var vtxCache = new VertexCache(g, Args.zdepth, Args.thickness);
+                var vtxCache = new VertexCache(g, 
+                    Args.zdepth, Args.thickness, Args.xoffset, Args.yoffset);
                 foreach (var pt in vtxCache.VerticesOfFace())
                     tee?.Invoke($"v {pt.X} {pt.Y} {pt.Z}");
                 foreach (var tri in vtxCache.TrianglesOfFace()) {

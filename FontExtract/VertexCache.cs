@@ -29,6 +29,8 @@ namespace FontExtract {
 
         private Arm[] _frontArms;
 
+        private Matrix4x4 _transl;
+
         private delegate void _AddTri(Triangle3 t);
         private delegate void _AddVertex(Point3 p);
 
@@ -247,6 +249,7 @@ namespace FontExtract {
 
         public VertexCache(
             RawGlyph glyph, int zdepth = 0, int thickness = 0,
+            int xoffset = 0, int yoffset = 0,
             VertexStore.Type containerType = VertexStore.Type.List) {
             _glyph = glyph;
             _zdepth = zdepth;
@@ -264,6 +267,8 @@ namespace FontExtract {
             _sideTris = new List<Triangle3>();
 
             _frontArms = null;
+
+            _transl = Matrix4x4.CreateTranslation(xoffset, yoffset, 0);
 
             _GatherMainOutline();
             _GatherFrontTessOutline();
@@ -304,11 +309,14 @@ namespace FontExtract {
 
         public IEnumerable<Point3> Vertices(Face face = Face.All) {
             if (face == Face.All)
-                return _vertexStore.Vertices;
+                return _vertexStore.Vertices.Select(
+                    p => Vector3.Transform(p, _transl));
             else if (face == Face.Front)
-                return _frontVertexStore.Vertices;
+                return _frontVertexStore.Vertices.Select(
+                    p => Vector3.Transform(p, _transl));
             else
-                return _sideVertexStore.Vertices;
+                return _sideVertexStore.Vertices.Select(
+                    p => Vector3.Transform(p, _transl));
         }
 
         public Triangle3[] Triangles(Face face = Face.All) {

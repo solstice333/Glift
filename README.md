@@ -10,10 +10,6 @@ Tested on OSX, 10.11.6 at the oldest. Open FontExtract/FontExtract.sln in Visual
 
 ## Usage
 
-**Warning**: --xoffset is *not yet implemented*
-
-**Warning**: --yoffset is *not yet implemented*
-
 Hopefully the help description below will suffice. If it does not, then let me know.
 
 ```
@@ -62,7 +58,6 @@ an A.obj will be written to the current directory. Opening it up in meshlab look
 
 ## TODO
 
-- x-offset, y-offset
 - side-only, front-only dump .obj in one shot (as opposed to being mutually exclusive)
 - refactor prismoid class
 - miter joints
