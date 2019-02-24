@@ -34,9 +34,11 @@ optional arguments:
   -s, --size=VALUE           size in points (1/72 of 1 inch). Defaults to 30-
                                0. Exit 1 if VALUE is not a valid floating point
   -x, --xoffset=VALUE        translate the model VALUE units across the x 
-                               axis. Exit 1 if VALUE is a non-integer
+                               axis. Exit 1 if VALUE is not a valid floating 
+                               point
   -y, --yoffset=VALUE        translate the model VALUE units across the y 
-                               axis. Exit 1 if VALUE is a non-integer
+                               axis. Exit 1 if VALUE is not a valid floating 
+                               point
   -z, --zdepth=VALUE         depth of the extrusion VALUE units across the z 
                                axis. Defaults to 50. Exit 1 if VALUE is a non-
                                integer
