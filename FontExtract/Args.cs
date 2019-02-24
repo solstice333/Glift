@@ -97,7 +97,8 @@ namespace FontExtract {
                 }
             },
             {
-                "t|thickness-outline", "thickness of outline in VALUE units",
+                "t|thickness-outline", "thickness of outline in VALUE " +
+                "units. Defaults to 20",
                 v => {
                     help = !int.TryParse(v, out thickness);
                     exst = help ? 1 : 0;
