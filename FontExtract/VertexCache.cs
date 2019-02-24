@@ -214,34 +214,45 @@ namespace FontExtract {
                 Prismoid upperPrismoid = arm.UpperPrismoid;
                 Prismoid lowerPrismoid = arm.LowerPrismoid;
 
-                var sqUpper1 = 
-                    new Square(upperPrismoid.PointsCWStartUpperLeft);
-                var sqUpper2 = 
-                    new Square(upperPrismoid.PointsCWStartUpperLeft.Skip(4));
-                var sqLower1 = 
-                    new Square(lowerPrismoid.PointsCWStartUpperLeft);
-                var sqLower2 = 
-                    new Square(lowerPrismoid.PointsCWStartUpperLeft.Skip(4));
+                var tessaTop1 = new Triangle3(
+                    upperPrismoid.Square1UpperLeft,
+                    upperPrismoid.Square1UpperRight,
+                    upperPrismoid.Square2UpperRight);
 
-                var tessaTop1 = new Triangle3(sqUpper1.UpLeft, 
-                    sqUpper1.UpRight, sqUpper2.UpRight);
-                var tessaTop2 = new Triangle3(sqUpper1.UpLeft,
-                    sqUpper2.UpRight, sqUpper2.UpLeft);
+                var tessaTop2 = new Triangle3(
+                    upperPrismoid.Square1UpperLeft,
+                    upperPrismoid.Square2UpperRight,
+                    upperPrismoid.Square2UpperLeft);
 
-                var tessaRight1 = new Triangle3(sqUpper1.UpRight,
-                    sqUpper2.DownRight, sqUpper2.UpRight);
-                var tessaRight2 = new Triangle3(sqUpper1.UpRight,
-                    sqUpper1.DownRight, sqUpper2.DownRight);
+                var tessaRight1 = new Triangle3(
+                    upperPrismoid.Square1UpperRight,
+                    upperPrismoid.Square2BottomRight,
+                    upperPrismoid.Square2UpperRight);
 
-                var tessaBottom1 = new Triangle3(sqUpper1.DownLeft,
-                    sqUpper2.DownLeft, sqUpper2.DownRight);
-                var tessaBottom2 = new Triangle3(sqUpper1.DownLeft,
-                    sqUpper2.DownRight, sqUpper1.DownRight);
+                var tessaRight2 = new Triangle3(
+                    upperPrismoid.Square1UpperRight,
+                    upperPrismoid.Square1BottomRight,
+                    upperPrismoid.Square2BottomRight);
 
-                var tessaLeft1 = new Triangle3(sqUpper1.UpLeft,
-                    sqUpper2.UpLeft, sqUpper2.DownLeft);
-                var tessaLeft2 = new Triangle3(sqUpper1.UpLeft,
-                    sqUpper2.DownLeft, sqUpper1.DownLeft);
+                var tessaBottom1 = new Triangle3(
+                    upperPrismoid.Square1BottomLeft,
+                    upperPrismoid.Square2BottomLeft,
+                    upperPrismoid.Square2BottomRight);
+
+                var tessaBottom2 = new Triangle3(
+                    upperPrismoid.Square1BottomLeft,
+                    upperPrismoid.Square2BottomRight,
+                    upperPrismoid.Square1BottomRight);
+
+                var tessaLeft1 = new Triangle3(
+                    upperPrismoid.Square1UpperLeft,
+                    upperPrismoid.Square2UpperLeft,
+                    upperPrismoid.Square2BottomLeft);
+
+                var tessaLeft2 = new Triangle3(
+                    upperPrismoid.Square1UpperLeft,
+                    upperPrismoid.Square2BottomLeft,
+                    upperPrismoid.Square1BottomLeft); 
 
                 _AddTri addTri = _tris.Add;
                 addTri += _frontTris.Add;
