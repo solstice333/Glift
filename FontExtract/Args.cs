@@ -8,8 +8,8 @@ namespace FontExtract {
         public static List<char> chars = new List<char>();
         public static bool frontOnly = false;
         public static bool sideOnly = false;
-        public static int xoffset = 0;
-        public static int yoffset = 0;
+        public static float xoffset = 0f;
+        public static float yoffset = 0f;
         public static int zdepth = -50;
         public static int thickness = 20;
         public static string ttfPath = "";
@@ -69,7 +69,7 @@ namespace FontExtract {
                 "x|xoffset=", "translate the model VALUE units across " +
                 "the x axis. Exit 1 if VALUE is a non-integer",
                 v => {
-                    help = !int.TryParse(v, out xoffset);
+                    help = !float.TryParse(v, out xoffset);
                     exst = help ? 1 : 0;
                 }
             },
@@ -77,7 +77,7 @@ namespace FontExtract {
                 "y|yoffset=", "translate the model VALUE units across " +
                 "the y axis. Exit 1 if VALUE is a non-integer",
                 v => {
-                    help = !int.TryParse(v, out yoffset);
+                    help = !float.TryParse(v, out yoffset);
                     exst = help ? 1 : 0;
                 }
             },

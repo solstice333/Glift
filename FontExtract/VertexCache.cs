@@ -259,7 +259,7 @@ namespace FontExtract {
 
         public VertexCache(
             RawGlyph glyph, int zdepth = 0, int thickness = 0,
-            int xoffset = 0, int yoffset = 0,
+            float xoffset = 0, float yoffset = 0,
             VertexStore.Type containerType = VertexStore.Type.List) {
             _glyph = glyph;
             _zdepth = zdepth;

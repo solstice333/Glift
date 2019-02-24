@@ -175,7 +175,9 @@ namespace FontExtractTest {
             var expectedSFront = FileInResources("SFrontOnly.exp");
 
             var ttf = TtfFile("Alef-Bold.ttf");
-            FontExtractRun($"-c B -c A -c S --front-only --side-only {ttf}");
+            FontExtractRun($"-c B -c A -c S " +
+                $"--xoffset -105.32 --yoffset -105.241 " +
+                $"--front-only --side-only {ttf}");
 
             FileAssert.AreEqual(actualASide, expectedASide);
             FileAssert.AreEqual(actualBSide, expectedBSide);
