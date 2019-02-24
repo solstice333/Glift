@@ -58,7 +58,6 @@ an A.obj will be written to the current directory. Opening it up in meshlab look
 
 ## TODO
 
-- xoffset, yoffset. Make floats
 - refactor prismoid class
 - miter joints
 
