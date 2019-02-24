@@ -67,7 +67,7 @@ namespace FontExtract {
             },
             {
                 "x|xoffset=", "translate the model VALUE units across " +
-                "the x axis. Exit 1 if VALUE is a non-integer",
+                "the x axis. Exit 1 if VALUE is not a valid floating point",
                 v => {
                     help = !float.TryParse(v, out xoffset);
                     exst = help ? 1 : 0;
@@ -75,7 +75,7 @@ namespace FontExtract {
             },
             {
                 "y|yoffset=", "translate the model VALUE units across " +
-                "the y axis. Exit 1 if VALUE is a non-integer",
+                "the y axis. Exit 1 if VALUE is not a valid floating point",
                 v => {
                     help = !float.TryParse(v, out yoffset);
                     exst = help ? 1 : 0;
