@@ -6,7 +6,7 @@ Extract glyphs from ttf and create .obj
 
 ## Build
 
-BTW, I've only really tested on OSX, 10.11.6 at the oldest. Open FontExtract/FontExtract.sln in Visual Studio Community and hit Command + K to build.
+Tested on OSX, 10.11.6 at the oldest. Open FontExtract/FontExtract.sln in Visual Studio Community and hit Command + K to build.
 
 ## Usage
 
@@ -58,7 +58,7 @@ $ mono FontExtract.exe -c A -s 300 ../../../FontExtractTest/Resources/Alef-Bold.
 
 an A.obj will be written to the current directory. Opening it up in meshlab looks something like...
 
-![A.obj](images/AMeshLab.png "A.obj")
+![A.obj](FontExtract/images/AMeshLab.png "A.obj")
 
 ## TODO
 
