@@ -43,7 +43,7 @@ optional arguments:
                                axis. Defaults to 50. Exit 1 if VALUE is a non-
                                integer
   -t, --thickness-outline    thickness of outline in VALUE units. Defaults to 
-                               20
+                               20. Exit 1 if VALUE is a non-integer
   -h, --help                 show this message and exit
 ```
 
@@ -61,4 +61,4 @@ an A.obj will be written to the current directory. Opening it up in meshlab look
 ## TODO
 
 - miter joints
-
+- cmd line arg for reducing number of triangles in mesh
