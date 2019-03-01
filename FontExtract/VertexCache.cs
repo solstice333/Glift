@@ -235,7 +235,7 @@ namespace FontExtract {
 
         private void _InitArms() {
             _frontArms = _FoldFrontIntoArms();
-            //_BindArms(_frontArms);
+            _BindArms(_frontArms);
         }
 
         private void _GatherPrismoidMainOutline() {
@@ -243,59 +243,58 @@ namespace FontExtract {
                 Prismoid upperPrismoid = arm.UpperPrismoid;
                 Prismoid lowerPrismoid = arm.LowerPrismoid;
 
-                //Vector2 upperVec =
-                //    upperPrismoid.CenterLine.P2.ToPoint2XY() -
-                //    upperPrismoid.CenterLine.P1.ToPoint2XY();
+                Vector2 upperUnit =
+                    Vector2.Normalize(
+                        upperPrismoid.CenterLine.P2.ToPoint2XY() -
+                        upperPrismoid.CenterLine.P1.ToPoint2XY());
 
-                //Vector2 lowerVec =
-                //    lowerPrismoid.CenterLine.P2.ToPoint2XY() -
-                //    lowerPrismoid.CenterLine.P1.ToPoint2XY();
+                Vector2 lowerUnit =
+                    Vector2.Normalize(
+                        lowerPrismoid.CenterLine.P2.ToPoint2XY() -
+                        lowerPrismoid.CenterLine.P1.ToPoint2XY());
 
-                //Vector2 tangentUnit = Vector2.Normalize(upperVec + lowerVec);
-                //Vector2 miterUnit = tangentUnit.Rotate90CW();
-                //Vector2 normalUnit = Vector2.Normalize(lowerVec.Rotate90CW());
-                //float tHalf = (float)_thickness / 2;
-                //float miterDist = tHalf / Vector2.Dot(miterUnit, normalUnit);
+                Vector2 tangentUnit = Vector2.Normalize(upperUnit + lowerUnit);
+                Vector2 miterUnit = Vector2.Normalize(tangentUnit.Rotate90CW());
+                Vector2 normalUnit = Vector2.Normalize(upperUnit.Rotate90CW());
+                float tHalf = (float)_thickness / 2;
+                float miterDist = tHalf / Vector2.Dot(miterUnit, normalUnit);
 
-                //Point3 miterLocTop = (miterUnit * miterDist).ToPoint3();
-                //Point3 miterLocBot = (-miterUnit * miterDist).ToPoint3();
+                Point3 miterLocTop = (miterUnit * miterDist).ToPoint3();
+                Point3 miterLocBot = (-miterUnit * miterDist).ToPoint3();
 
-                //Point3 miterLocTopIn = miterLocTop;
-                //Point3 miterLocTopOut = miterLocTop;
-                //Point3 miterLocBotIn = miterLocBot;
-                //Point3 miterLocBotOut = miterLocBot;
+                Point3 miterLocTopIn = miterLocTop;
+                Point3 miterLocTopOut = miterLocTop;
+                Point3 miterLocBotIn = miterLocBot;
+                Point3 miterLocBotOut = miterLocBot;
 
-                //miterLocTopIn.Z = tHalf;
-                //miterLocTopOut.Z = -tHalf;
-                //miterLocBotIn.Z = tHalf;
-                //miterLocBotOut.Z = -tHalf;
+                miterLocTopIn.Z = tHalf;
+                miterLocTopOut.Z = -tHalf;
+                miterLocBotIn.Z = tHalf;
+                miterLocBotOut.Z = -tHalf;
 
-                //upperPrismoid.Square2UpLeft = miterLocTopIn;
-                //upperPrismoid.Square2UpRight = miterLocTopOut;
-                //upperPrismoid.Square2DownRight = miterLocBotOut;
-                //upperPrismoid.Square2DownLeft = miterLocBotIn;
-
-                //lowerPrismoid.Square1UpLeft = miterLocTopIn;
-                //lowerPrismoid.Square1UpRight = miterLocTopOut;
-                //lowerPrismoid.Square1DownRight = miterLocBotOut;
-                //lowerPrismoid.Square1DownLeft = miterLocBotIn;
+                upperPrismoid.Square2UpLeft = 
+                    upperPrismoid.CenterLine.P2 + miterLocTopIn;
+                upperPrismoid.Square2UpRight = 
+                    upperPrismoid.CenterLine.P2 + miterLocTopOut;
+                upperPrismoid.Square2DownRight = 
+                    upperPrismoid.CenterLine.P2 + miterLocBotOut;
+                upperPrismoid.Square2DownLeft = 
+                    upperPrismoid.CenterLine.P2 + miterLocBotIn;
 
                 _AddVertex addVertex = _vertexStore.Add;
                 addVertex += _frontVertexStore.Add;
 
-                foreach (Point3 p in upperPrismoid.PointsCWStartUpperLeft)
-                    addVertex(p);
-
-                //addVertex(miterLocTopIn);
-                //addVertex(miterLocTopOut);
-                //addVertex(miterLocBotOut);
-                //addVertex(miterLocBotIn);
+                addVertex(upperPrismoid.Square2UpLeft);
+                addVertex(upperPrismoid.Square2UpRight);
+                addVertex(upperPrismoid.Square2DownRight);
+                addVertex(upperPrismoid.Square2DownLeft);
             }
         }
 
         private void _GatherPrismoidMainOutlineTess() {
             foreach (Arm arm in _frontArms) {
                 Prismoid upperPrismoid = arm.UpperPrismoid;
+                Prismoid lowerPrismoid = arm.LowerPrismoid;
 
                 var tessaTop1 = new Triangle3(
                     upperPrismoid.Square1UpLeft,

@@ -29,5 +29,5 @@ optional arguments:
                                integer
   -t, --thickness-outline=VALUE
                              thickness of outline in VALUE units. Defaults to 
-                               20. Exit 1 if VALUE is a non-integer
+                               10. Exit 1 if VALUE is a non-integer
   -h, --help                 show this message and exit
