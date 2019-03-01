@@ -27,6 +27,7 @@ optional arguments:
                                f. This can stack
       --front-only           generate a .obj for the front face only
       --side-only            generate a .obj for the side face only
+      --outline-only         generate a .obj for the outline face only
   -l, --list-names           list glyph names
   -p, --print                print .obj to console
   -d, --dry-run              do not write to .obj. Useful with -p if printing 
@@ -46,6 +47,7 @@ optional arguments:
                              thickness of outline in VALUE units. Defaults to 
                                10. Exit 1 if VALUE is a non-integer
   -h, --help                 show this message and exit
+
 ```
 
 ## Example

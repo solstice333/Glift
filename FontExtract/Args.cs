@@ -8,6 +8,7 @@ namespace FontExtract {
         public static List<char> chars = new List<char>();
         public static bool frontOnly = false;
         public static bool sideOnly = false;
+        public static bool outlineOnly = false;
         public static float xoffset = 0f;
         public static float yoffset = 0f;
         public static int zdepth = -50;
@@ -42,6 +43,10 @@ namespace FontExtract {
             {
                 "side-only", "generate a .obj for the side face only",
                 v => sideOnly = true
+            },
+            {
+                "outline-only", "generate a .obj for the outline face only",
+                v => outlineOnly = true
             },
             {
                 "l|list-names", "list glyph names",
