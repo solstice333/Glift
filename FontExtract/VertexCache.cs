@@ -106,6 +106,47 @@ namespace FontExtract {
             return frontArms.ToArray();
         }
 
+        private void _BindArms(Arm[] arms) {
+            foreach (Arm arm1 in arms) {
+                var arm1Squares = new Square[] {
+                    arm1.UpperPrismoid.Square1,
+                    arm1.UpperPrismoid.Square2,
+                    arm1.LowerPrismoid.Square1,
+                    arm1.LowerPrismoid.Square2
+                };
+
+                var arm1Points = new Point3[] {
+                    arm1.UpperSegment.P1,
+                    arm1.UpperSegment.P2,
+                    arm1.LowerSegment.P1,
+                    arm1.LowerSegment.P2
+                };
+
+                foreach (Arm arm2 in arms) {
+                    var arm2Squares = new Square[] {
+                        arm2.UpperPrismoid.Square1,
+                        arm2.UpperPrismoid.Square2,
+                        arm2.LowerPrismoid.Square1,
+                        arm2.LowerPrismoid.Square2
+                    };
+
+                    var arm2Points = new Point3[] {
+                        arm2.UpperSegment.P1,
+                        arm2.UpperSegment.P2,
+                        arm2.LowerSegment.P1,
+                        arm2.LowerSegment.P2
+                    };
+
+                    for (int i = 0; i < arm1Points.Length; ++i) {
+                        for (int j = 0; j < arm2Points.Length; ++j) {
+                            if (arm1Points[i].EqualsEps(arm2Points[j]))
+                                arm1Squares[i].BindTo(arm2Squares[j]);
+                        }
+                    }
+                }
+            }
+        }
+
         private void _GatherMainOutline() {
             foreach (var p in _glyph.Vertices()) {
                 var vertex = new Point3(p.X, p.Y, 0);
@@ -192,67 +233,109 @@ namespace FontExtract {
             }
         }
 
-        private void _GatherPrismoidMainOutline() {
+        private void _InitArms() {
             _frontArms = _FoldFrontIntoArms();
+            //_BindArms(_frontArms);
+        }
 
-            foreach (var arm in _frontArms) {
+        private void _GatherPrismoidMainOutline() {
+            foreach (Arm arm in _frontArms) {
                 Prismoid upperPrismoid = arm.UpperPrismoid;
                 Prismoid lowerPrismoid = arm.LowerPrismoid;
-                foreach (Point3 p in upperPrismoid.PointsCWStartUpperLeft) {
-                    _vertexStore.Add(p);
-                    _frontVertexStore.Add(p);
-                }
-                foreach (Point3 p in lowerPrismoid.PointsCWStartUpperLeft) {
-                    _vertexStore.Add(p);
-                    _frontVertexStore.Add(p);
-                }
+
+                //Vector2 upperVec =
+                //    upperPrismoid.CenterLine.P2.ToPoint2XY() -
+                //    upperPrismoid.CenterLine.P1.ToPoint2XY();
+
+                //Vector2 lowerVec =
+                //    lowerPrismoid.CenterLine.P2.ToPoint2XY() -
+                //    lowerPrismoid.CenterLine.P1.ToPoint2XY();
+
+                //Vector2 tangentUnit = Vector2.Normalize(upperVec + lowerVec);
+                //Vector2 miterUnit = tangentUnit.Rotate90CW();
+                //Vector2 normalUnit = Vector2.Normalize(lowerVec.Rotate90CW());
+                //float tHalf = (float)_thickness / 2;
+                //float miterDist = tHalf / Vector2.Dot(miterUnit, normalUnit);
+
+                //Point3 miterLocTop = (miterUnit * miterDist).ToPoint3();
+                //Point3 miterLocBot = (-miterUnit * miterDist).ToPoint3();
+
+                //Point3 miterLocTopIn = miterLocTop;
+                //Point3 miterLocTopOut = miterLocTop;
+                //Point3 miterLocBotIn = miterLocBot;
+                //Point3 miterLocBotOut = miterLocBot;
+
+                //miterLocTopIn.Z = tHalf;
+                //miterLocTopOut.Z = -tHalf;
+                //miterLocBotIn.Z = tHalf;
+                //miterLocBotOut.Z = -tHalf;
+
+                //upperPrismoid.Square2UpLeft = miterLocTopIn;
+                //upperPrismoid.Square2UpRight = miterLocTopOut;
+                //upperPrismoid.Square2DownRight = miterLocBotOut;
+                //upperPrismoid.Square2DownLeft = miterLocBotIn;
+
+                //lowerPrismoid.Square1UpLeft = miterLocTopIn;
+                //lowerPrismoid.Square1UpRight = miterLocTopOut;
+                //lowerPrismoid.Square1DownRight = miterLocBotOut;
+                //lowerPrismoid.Square1DownLeft = miterLocBotIn;
+
+                _AddVertex addVertex = _vertexStore.Add;
+                addVertex += _frontVertexStore.Add;
+
+                foreach (Point3 p in upperPrismoid.PointsCWStartUpperLeft)
+                    addVertex(p);
+
+                //addVertex(miterLocTopIn);
+                //addVertex(miterLocTopOut);
+                //addVertex(miterLocBotOut);
+                //addVertex(miterLocBotIn);
             }
         }
 
         private void _GatherPrismoidMainOutlineTess() {
-            foreach (var arm in _frontArms) {
+            foreach (Arm arm in _frontArms) {
                 Prismoid upperPrismoid = arm.UpperPrismoid;
-                Prismoid lowerPrismoid = arm.LowerPrismoid;
 
                 var tessaTop1 = new Triangle3(
-                    upperPrismoid.Square1UpperLeft,
-                    upperPrismoid.Square1UpperRight,
-                    upperPrismoid.Square2UpperRight);
+                    upperPrismoid.Square1UpLeft,
+                    upperPrismoid.Square1UpRight,
+                    upperPrismoid.Square2UpRight);
 
                 var tessaTop2 = new Triangle3(
-                    upperPrismoid.Square1UpperLeft,
-                    upperPrismoid.Square2UpperRight,
-                    upperPrismoid.Square2UpperLeft);
+                    upperPrismoid.Square1UpLeft,
+                    upperPrismoid.Square2UpRight,
+                    upperPrismoid.Square2UpLeft);
 
                 var tessaRight1 = new Triangle3(
-                    upperPrismoid.Square1UpperRight,
-                    upperPrismoid.Square2BottomRight,
-                    upperPrismoid.Square2UpperRight);
+                    upperPrismoid.Square1UpRight,
+                    upperPrismoid.Square2DownRight,
+                    upperPrismoid.Square2UpRight);
 
                 var tessaRight2 = new Triangle3(
-                    upperPrismoid.Square1UpperRight,
-                    upperPrismoid.Square1BottomRight,
-                    upperPrismoid.Square2BottomRight);
+                    upperPrismoid.Square1UpRight,
+                    upperPrismoid.Square1DownRight,
+                    upperPrismoid.Square2DownRight);
 
-                var tessaBottom1 = new Triangle3(
-                    upperPrismoid.Square1BottomLeft,
-                    upperPrismoid.Square2BottomLeft,
-                    upperPrismoid.Square2BottomRight);
+                var tessaDown1 = new Triangle3(
+                    upperPrismoid.Square1DownLeft,
+                    upperPrismoid.Square2DownLeft,
+                    upperPrismoid.Square2DownRight);
 
-                var tessaBottom2 = new Triangle3(
-                    upperPrismoid.Square1BottomLeft,
-                    upperPrismoid.Square2BottomRight,
-                    upperPrismoid.Square1BottomRight);
+                var tessaDown2 = new Triangle3(
+                    upperPrismoid.Square1DownLeft,
+                    upperPrismoid.Square2DownRight,
+                    upperPrismoid.Square1DownRight);
 
                 var tessaLeft1 = new Triangle3(
-                    upperPrismoid.Square1UpperLeft,
-                    upperPrismoid.Square2UpperLeft,
-                    upperPrismoid.Square2BottomLeft);
+                    upperPrismoid.Square1UpLeft,
+                    upperPrismoid.Square2UpLeft,
+                    upperPrismoid.Square2DownLeft);
 
                 var tessaLeft2 = new Triangle3(
-                    upperPrismoid.Square1UpperLeft,
-                    upperPrismoid.Square2BottomLeft,
-                    upperPrismoid.Square1BottomLeft); 
+                    upperPrismoid.Square1UpLeft,
+                    upperPrismoid.Square2DownLeft,
+                    upperPrismoid.Square1DownLeft);
 
                 _AddTri addTri = _tris.Add;
                 addTri += _frontTris.Add;
@@ -261,8 +344,8 @@ namespace FontExtract {
                 addTri(tessaTop2);
                 addTri(tessaRight1);
                 addTri(tessaRight2);
-                addTri(tessaBottom1);
-                addTri(tessaBottom2);
+                addTri(tessaDown1);
+                addTri(tessaDown2);
                 addTri(tessaLeft1);
                 addTri(tessaLeft2);
             }
@@ -295,6 +378,7 @@ namespace FontExtract {
             _GatherFrontTessOutline();
             _GatherExtrudePoints();
             _GatherSideTess();
+            _InitArms();
             _GatherPrismoidMainOutline();
             _GatherPrismoidMainOutlineTess();
         }

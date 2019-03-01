@@ -3,7 +3,7 @@ using System.Numerics;
 using Point3 = System.Numerics.Vector3;
 
 namespace FontExtract {
-    public struct Arm {
+    public class Arm {
         private Point3Pair _upperSegment;
         private Point3Pair _lowerSegment;
         private Prismoid _upperPrismoid;

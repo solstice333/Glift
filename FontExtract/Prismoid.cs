@@ -9,7 +9,8 @@ namespace FontExtract {
     public class Prismoid {
         private Point3Pair _centerline;
         private int _thickness;
-        private Point3[] _vertices;
+        private Square _square1;
+        private Square _square2;
 
         private enum RelativePoint { P1, P2 }
 
@@ -51,11 +52,34 @@ namespace FontExtract {
             };
         }
 
+        private void _InitSquare1() {
+            _square1 = new Square(_SquarePoints(RelativePoint.P1));
+        }
+
+        private void _InitSquare2() {
+            _square2 = new Square(_SquarePoints(RelativePoint.P2));
+        }
+
+        private void _InitVerticesIfNull() {
+            if (_square1 == null)
+                _InitSquare1();
+            if (_square2 == null)
+                _InitSquare2();
+        }
+
+        public Prismoid(Point3Pair segment, int thickness) {
+            _AssertSegmentIs2DXY(segment);
+            _thickness = thickness;
+            _square1 = null;
+            _square2 = null;
+            _centerline = segment;
+        }
+
         public Point3Pair CenterLine {
             get => _centerline;
             set {
                 _centerline = value;
-                _vertices = null;
+                Reset();
             }
         }
 
@@ -63,7 +87,7 @@ namespace FontExtract {
             get => _thickness / 2;
             set {
                 _thickness = value * 2;
-                _vertices = null;
+                Reset();
             }
         }
 
@@ -71,109 +95,133 @@ namespace FontExtract {
             get => _thickness;
             set {
                 _thickness = value;
-                _vertices = null;
+                Reset();
             }
-        }
-
-        private void _InitVertices() {
-            List<Point3> verts = new List<Point3>();
-            foreach (Point3 p in _SquarePoints(RelativePoint.P1))
-                verts.Add(p);
-            foreach (Point3 p in _SquarePoints(RelativePoint.P2))
-                verts.Add(p);
-            _vertices = verts.ToArray();
         }
 
         public IEnumerable<Point3> PointsCWStartUpperLeft {
             get {
-                if (_vertices == null)
-                    _InitVertices();
-                foreach (Point3 vert in _vertices)
+                _InitVerticesIfNull();
+                foreach (Point3 vert in _square1.PointsCWStartUpperLeft)
+                    yield return vert;
+                foreach (Point3 vert in _square2.PointsCWStartUpperLeft)
                     yield return vert;
             }
         }
 
-        public Prismoid(Point3Pair segment, int thickness) {
-            _AssertSegmentIs2DXY(segment);
-            _thickness = thickness;
-            _vertices = null; 
-            _centerline = segment;
-        }
-
-        public Point3 Square1UpperLeft {
+        public Square Square1 {
             get {
-                if (_vertices == null)
-                    _InitVertices();
-                return _vertices[0];
+                _InitVerticesIfNull();
+                return _square1;
             }
-            set => _vertices[0] = value;
+            set {
+                _InitVerticesIfNull();
+                _square1 = value;
+            }
         }
 
-        public Point3 Square1UpperRight {
+        public Square Square2 {
             get {
-                if (_vertices == null)
-                    _InitVertices();
-                return _vertices[1];
+                _InitVerticesIfNull();
+                return _square2;
             }
-            set => _vertices[1] = value;
+            set {
+                _InitVerticesIfNull();
+                _square2 = value;
+            }
         }
 
-        public Point3 Square1BottomRight {
+        public Point3 Square1UpLeft {
             get {
-                if (_vertices == null)
-                    _InitVertices();
-                return _vertices[2];
+                _InitVerticesIfNull();
+                return _square1.UpLeft;
             }
-            set => _vertices[2] = value;
+            set {
+                _InitVerticesIfNull();
+                _square1.UpLeft = value;
+            }
         }
 
-        public Point3 Square1BottomLeft {
+        public Point3 Square1UpRight {
             get {
-                if (_vertices == null)
-                    _InitVertices();
-                return _vertices[3];
+                _InitVerticesIfNull();
+                return _square1.UpRight;
             }
-            set => _vertices[3] = value;
+            set {
+                _InitVerticesIfNull();
+                _square1.UpRight = value;
+            }
         }
 
-        public Point3 Square2UpperLeft {
+        public Point3 Square1DownRight {
             get {
-                if (_vertices == null)
-                    _InitVertices();
-                return _vertices[4];
+                _InitVerticesIfNull();
+                return _square1.DownRight;
             }
-            set => _vertices[4] = value;
+            set {
+                _InitVerticesIfNull();
+                _square1.DownRight = value;
+            }
         }
 
-        public Point3 Square2UpperRight {
+        public Point3 Square1DownLeft {
             get {
-                if (_vertices == null)
-                    _InitVertices();
-                return _vertices[5];
+                _InitVerticesIfNull();
+                return _square1.DownLeft;
             }
-            set => _vertices[5] = value;
+            set {
+                _InitVerticesIfNull();
+                _square1.DownLeft = value;
+            }
         }
 
-        public Point3 Square2BottomRight {
+        public Point3 Square2UpLeft {
             get {
-                if (_vertices == null)
-                    _InitVertices();
-                return _vertices[6];
+                _InitVerticesIfNull();
+                return _square2.UpLeft;
             }
-            set => _vertices[6] = value;
+            set {
+                _InitVerticesIfNull();
+                _square2.UpLeft = value;
+            }
         }
 
-        public Point3 Square2BottomLeft {
+        public Point3 Square2UpRight {
             get {
-                if (_vertices == null)
-                    _InitVertices();
-                return _vertices[7];
+                _InitVerticesIfNull();
+                return _square2.UpRight;
             }
-            set => _vertices[7] = value;
+            set {
+                _InitVerticesIfNull();
+                _square2.UpRight = value;
+            }
         }
 
-        public void ResetVertices() {
-            _vertices = null;
+        public Point3 Square2DownRight {
+            get {
+                _InitVerticesIfNull();
+                return _square2.DownRight;
+            }
+            set {
+                _InitVerticesIfNull();
+                _square2.DownRight = value;
+            }
+        }
+
+        public Point3 Square2DownLeft {
+            get {
+                _InitVerticesIfNull();
+                return _square2.DownLeft;
+            }
+            set {
+                _InitVerticesIfNull();
+                _square2.DownLeft = value;
+            }
+        }
+
+        public void Reset() {
+            _square1 = null;
+            _square2 = null;
         }
     }
 }
