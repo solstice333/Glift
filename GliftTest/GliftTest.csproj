@@ -7,8 +7,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{C17F91CF-F71F-426E-ADA2-6D6A80CD1911}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>FontExtractTest</RootNamespace>
-    <AssemblyName>FontExtractTest</AssemblyName>
+    <RootNamespace>GliftTest</RootNamespace>
+    <AssemblyName>GliftTest</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -38,7 +38,6 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Resources\Typeface.ttf" />
-    <None Include="Resources\fontExtractHelp.exp" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />

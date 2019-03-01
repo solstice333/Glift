@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using NDesk.Options;
 
-namespace FontExtract {
+namespace Glift {
     static class Args {
         public static bool help = false;
         public static List<char> chars = new List<char>();
@@ -113,7 +113,9 @@ namespace FontExtract {
         };
 
         private static void _ShowHelp(OptionSet parser) {
-            Console.WriteLine("usage: FontExtract [OPTIONS]+ TTF");
+            Console.WriteLine("usage: " +
+                $"{System.AppDomain.CurrentDomain.FriendlyName} " +
+                "[OPTIONS]+ TTF");
             Console.WriteLine();
             Console.WriteLine("convert .ttf glyphs to .obj");
             Console.WriteLine();

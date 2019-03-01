@@ -13,7 +13,7 @@ using DrawingGL.Text;
 
 using Util;
 
-namespace FontExtract {
+namespace Glift {
     using Face = VertexCache.Face;
 
     static class Globals {

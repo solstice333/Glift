@@ -10,7 +10,7 @@ using Point3 = System.Numerics.Vector3;
 
 using Util;
 
-namespace FontExtract {
+namespace Glift {
     public class VertexCache {
         private RawGlyph _glyph;
         private int _zdepth;

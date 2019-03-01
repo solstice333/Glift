@@ -5,7 +5,7 @@ using System.Numerics;
 using Point2 = System.Numerics.Vector2;
 using Point3 = System.Numerics.Vector3;
 
-namespace FontExtract {
+namespace Glift {
     public class Prismoid {
         private Point3Pair _centerline;
         private int _thickness;

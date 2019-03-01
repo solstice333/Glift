@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 using Point2 = System.Numerics.Vector2;
 
-namespace FontExtract {
+namespace Glift {
     public static class VertexIter {
         public delegate void VertexHandler(
             int currIdx, int contourStartIdx, int contourEndIdx);

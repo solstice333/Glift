@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 using Point3 = System.Numerics.Vector3;
 
-namespace FontExtract {
+namespace Glift {
     using VCacheList = List<(Point3 Point, int Index)>;
     using VCacheDict = Dictionary<Point3, int>;
 

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 using Point3 = System.Numerics.Vector3;
 
-namespace FontExtract {
+namespace Glift {
     public class Square {
         private LinkedList<Square> _squares;
         private Point3 _upLeft;

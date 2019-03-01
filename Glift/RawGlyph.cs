@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using Point2 = System.Numerics.Vector2;
 
-namespace FontExtract {
+namespace Glift {
     public class RawGlyph {
         private static HashSet<string> _allNames = new HashSet<string>();
 

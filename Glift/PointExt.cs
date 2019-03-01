@@ -2,7 +2,7 @@
 using Point2 = System.Numerics.Vector2;
 using Point3 = System.Numerics.Vector3;
 
-namespace FontExtract {
+namespace Glift {
     public static class PointExt {
         public static bool EqualsEps(this Point3 p1, Point3 p2) {
             return p1.X.EqualsEps(p2.X) &&

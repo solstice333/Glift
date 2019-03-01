@@ -2,7 +2,7 @@
 using System.Numerics;
 using Point3 = System.Numerics.Vector3;
 
-namespace FontExtract {
+namespace Glift {
     public class Arm {
         private Point3Pair _upperSegment;
         private Point3Pair _lowerSegment;

@@ -3,7 +3,7 @@ using System.Numerics;
 using Point2 = System.Numerics.Vector2;
 using Point3 = System.Numerics.Vector3;
 
-namespace FontExtract {
+namespace Glift {
     public class Triangle2 {
         public Point2 P1 { get; set; }
         public Point2 P2 { get; set; }

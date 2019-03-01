@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
 
-namespace FontExtract {
+namespace Glift {
     public class SideFace {
         public Point3Pair PP1 { get; set; }
         public Point3Pair PP2 { get; set; }

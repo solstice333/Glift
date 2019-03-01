@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FontExtract {
+namespace Glift {
     public static class SingleExt {
         public static float Epsilon = 0.001f;
 

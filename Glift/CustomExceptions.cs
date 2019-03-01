@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using Point3 = System.Numerics.Vector3;
 
-namespace FontExtract {
+namespace Glift {
     public class VertexNotFoundException : KeyNotFoundException {
         public VertexNotFoundException(Point3 point, Exception e = null) :
             base($"vertex {point} not found", e) { }

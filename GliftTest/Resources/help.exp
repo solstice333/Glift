@@ -1,4 +1,4 @@
-usage: FontExtract [OPTIONS]+ TTF
+usage: Glift.exe [OPTIONS]+ TTF
 
 convert .ttf glyphs to .obj
 
