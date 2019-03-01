@@ -159,7 +159,34 @@ namespace FontExtractTest {
         }
 
         [Test]
-        public void ABSObjXYOffsetFrontSideTest() {
+        public void AObjOutlineTest() {
+            var actual = FileInThisBinDir("A.obj");
+            var expected = FileInResources("AOutline.exp");
+            var ttf = TtfFile("Alef-Bold.ttf");
+            FontExtractRun($"-c A --outline-only {ttf}");
+            FileAssert.AreEqual(actual, expected);
+        }
+
+        [Test]
+        public void SObjOutlineTest() {
+            var actual = FileInThisBinDir("S.obj");
+            var expected = FileInResources("SOutline.exp");
+            var ttf = TtfFile("Alef-Bold.ttf");
+            FontExtractRun($"-c S --outline-only {ttf}");
+            FileAssert.AreEqual(actual, expected);
+        }
+
+        [Test]
+        public void BObjOutlineTest() {
+            var actual = FileInThisBinDir("B.obj");
+            var expected = FileInResources("BOutline.exp");
+            var ttf = TtfFile("Alef-Bold.ttf");
+            FontExtractRun($"-c B --outline-only {ttf}");
+            FileAssert.AreEqual(actual, expected);
+        }
+
+        [Test]
+        public void ABSObjXYOffsetFrontSideOutlineTest() {
             var actualASide = FileInThisBinDir("ASideOnly.obj");
             var expectedASide = FileInResources("ASideOnly.exp");
             var actualBSide = FileInThisBinDir("BSideOnly.obj");
@@ -174,10 +201,17 @@ namespace FontExtractTest {
             var actualSFront = FileInThisBinDir("SFrontOnly.obj");
             var expectedSFront = FileInResources("SFrontOnly.exp");
 
+            var actualAOutline = FileInThisBinDir("AOutlineOnly.obj");
+            var expectedAOutline = FileInResources("AOutlineOnly.exp");
+            var actualBOutline = FileInThisBinDir("BOutlineOnly.obj");
+            var expectedBOutline = FileInResources("BOutlineOnly.exp");
+            var actualSOutline = FileInThisBinDir("SOutlineOnly.obj");
+            var expectedSOutline = FileInResources("SOutlineOnly.exp");
+
             var ttf = TtfFile("Alef-Bold.ttf");
             FontExtractRun($"-c B -c A -c S " +
                 $"--xoffset -105.32 --yoffset -105.241 " +
-                $"--front-only --side-only {ttf}");
+                $"--front-only --side-only --outline-only {ttf}");
 
             FileAssert.AreEqual(actualASide, expectedASide);
             FileAssert.AreEqual(actualBSide, expectedBSide);
@@ -185,12 +219,28 @@ namespace FontExtractTest {
             FileAssert.AreEqual(actualAFront, expectedAFront);
             FileAssert.AreEqual(actualBFront, expectedBFront);
             FileAssert.AreEqual(actualSFront, expectedSFront);
+            FileAssert.AreEqual(actualAOutline, expectedAOutline);
+            FileAssert.AreEqual(actualBOutline, expectedBOutline);
+            FileAssert.AreEqual(actualSOutline, expectedSOutline);
         }
 
         [OneTimeTearDown]
         public void TearDownOnce() {
             File.Delete(FileInThisBinDir("A.obj"));
+            File.Delete(FileInThisBinDir("B.obj"));
             File.Delete(FileInThisBinDir("S.obj"));
+
+            File.Delete(FileInThisBinDir("AFrontOnly.obj"));
+            File.Delete(FileInThisBinDir("BFrontOnly.obj"));
+            File.Delete(FileInThisBinDir("SFrontOnly.obj"));
+
+            File.Delete(FileInThisBinDir("ASideOnly.obj"));
+            File.Delete(FileInThisBinDir("BSideOnly.obj"));
+            File.Delete(FileInThisBinDir("SSideOnly.obj"));
+
+            File.Delete(FileInThisBinDir("AOutlineOnly.obj"));
+            File.Delete(FileInThisBinDir("BOutlineOnly.obj"));
+            File.Delete(FileInThisBinDir("SOutlineOnly.obj"));
         }
     }
 }
