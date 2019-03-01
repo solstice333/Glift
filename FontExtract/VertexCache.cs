@@ -22,30 +22,49 @@ namespace FontExtract {
         private VertexStore _frontVertexStore;
         private VertexStore _frontSkeletonVertexStore;
         private VertexStore _sideVertexStore;
+        private VertexStore _outlineVertexStore;
 
         private List<Triangle3> _tris;
         private List<Triangle3> _frontTris;
         private List<Triangle3> _sideTris;
+        private List<Triangle3> _outlineTris;
 
         private Arm[] _frontArms;
 
         private Matrix4x4 _transl;
 
-        private delegate void _AddTri(Triangle3 t);
-        private delegate void _AddVertex(Point3 p);
+        private delegate void _TriAdder(Triangle3 t);
+        private delegate void _VertexAdder(Point3 p);
+        private delegate IEnumerable<Point3> _VertGetter(Face f);
+        private delegate bool _ContainmentChecker(Point3 p);
+        private delegate int _IndexOfGetter(Point3 p);
+
 
         public enum Face {
-            Front, Side, All
+            Front, Side, Outline, All
+        }
+
+        private IEnumerable<VertexStore> _VertexStores {
+            get {
+                return new VertexStore[] { 
+                    _vertexStore, 
+                    _frontVertexStore, 
+                    _frontSkeletonVertexStore, 
+                    _sideVertexStore, 
+                    _outlineVertexStore 
+                };
+            }
         }
 
         private IEnumerable<Point3> _NonTranslatedVertices(
             Face face = Face.All) {
-            if (face == Face.All)
-                return _vertexStore.Vertices;
-            else if (face == Face.Front)
-                return _frontVertexStore.Vertices;
-            else
-                return _sideVertexStore.Vertices;
+            var d = new Dictionary<Face, VertexStore> {
+                { Face.Front, _frontVertexStore},
+                { Face.Side, _sideVertexStore},
+                { Face.Outline, _outlineVertexStore},
+                { Face.All, _vertexStore }
+            };
+            return d[face].Vertices;
         }
 
         private void _PopulateSideFaces() {
@@ -281,8 +300,9 @@ namespace FontExtract {
                 upperPrismoid.Square2DownLeft = 
                     upperPrismoid.CenterLine.P2 + miterLocBotIn;
 
-                _AddVertex addVertex = _vertexStore.Add;
+                _VertexAdder addVertex = _vertexStore.Add;
                 addVertex += _frontVertexStore.Add;
+                addVertex += _outlineVertexStore.Add;
 
                 addVertex(upperPrismoid.Square2UpLeft);
                 addVertex(upperPrismoid.Square2UpRight);
@@ -336,8 +356,9 @@ namespace FontExtract {
                     upperPrismoid.Square2DownLeft,
                     upperPrismoid.Square1DownLeft);
 
-                _AddTri addTri = _tris.Add;
+                _TriAdder addTri = _tris.Add;
                 addTri += _frontTris.Add;
+                addTri += _outlineTris.Add;
 
                 addTri(tessaTop1);
                 addTri(tessaTop2);
@@ -363,11 +384,13 @@ namespace FontExtract {
             _vertexStore = new VertexStore(containerType);
             _frontVertexStore = new VertexStore(containerType);
             _sideVertexStore = new VertexStore(containerType);
+            _outlineVertexStore = new VertexStore(containerType);
             _frontSkeletonVertexStore = new VertexStore(containerType);
 
             _tris = new List<Triangle3>();
             _frontTris = new List<Triangle3>();
             _sideTris = new List<Triangle3>();
+            _outlineTris = new List<Triangle3>();
 
             _frontArms = null;
 
@@ -385,51 +408,49 @@ namespace FontExtract {
         public VertexStore.Type ContainerType {
             get => _vertexStore.ContainerType;
             set {
-                _vertexStore.ContainerType = value;
-                _frontVertexStore.ContainerType = value;
-                _sideVertexStore.ContainerType = value;
-                _frontSkeletonVertexStore.ContainerType = value;
+                foreach (VertexStore store in _VertexStores)
+                    store.ContainerType = value;
             }
         }
 
         public bool Contains(Point3 vertex, Face face = Face.All) {
-            if (face == Face.All)
-                return _vertexStore.Contains(vertex);
-            else if (face == Face.Front)
-                return _frontVertexStore.Contains(vertex);
-            else
-                return _sideVertexStore.Contains(vertex);
+            var d = new Dictionary<Face, _ContainmentChecker> {
+                { Face.Front, _frontVertexStore.Contains },
+                { Face.Side, _sideVertexStore.Contains },
+                { Face.Outline, _outlineVertexStore.Contains },
+                { Face.All, _vertexStore.Contains }
+            };
+            return d[face](vertex);
         }
 
         public int IndexOf(Point3 vertex, Face face = Face.All) {
-            if (face == Face.All)
-                return _vertexStore.IndexOf(vertex);
-            else if (face == Face.Front)
-                return _frontVertexStore.IndexOf(vertex);
-            else
-                return _sideVertexStore.IndexOf(vertex);
-
+            var d = new Dictionary<Face, _IndexOfGetter> {
+                { Face.Front, _frontVertexStore.IndexOf },
+                { Face.Side, _sideVertexStore.IndexOf },
+                { Face.Outline, _outlineVertexStore.IndexOf },
+                { Face.All, _vertexStore.IndexOf }
+            };
+            return d[face](vertex);
         }
 
         public IEnumerable<Point3> Vertices(Face face = Face.All) {
-            if (face == Face.All)
-                return _NonTranslatedVertices(Face.All).Select(
-                    p => Vector3.Transform(p, _transl));
-            else if (face == Face.Front)
-                return _NonTranslatedVertices(Face.Front).Select(
-                    p => Vector3.Transform(p, _transl));
-            else
-                return _NonTranslatedVertices(Face.Side).Select(
-                    p => Vector3.Transform(p, _transl));
+            var d = new Dictionary<Face, _VertGetter> {
+                { Face.Front, _NonTranslatedVertices },
+                { Face.Side, _NonTranslatedVertices },
+                { Face.Outline, _NonTranslatedVertices },
+                { Face.All, _NonTranslatedVertices }
+            };
+            return d[face](face).Select(p => Vector3.Transform(p, _transl));
         }
 
         public IEnumerable<Triangle3> Triangles(Face face = Face.All) {
-            if (face == Face.All)
-                return _tris;
-            else if (face == Face.Front)
-                return _frontTris;
-            else
-                return _sideTris;
+            var d = new Dictionary<Face, List<Triangle3>> {
+                { Face.Front, _frontTris },
+                { Face.Side, _sideTris },
+                { Face.Outline, _outlineTris },
+                { Face.All, _tris }
+            };
+            return d[face];
         }
     }
 }
