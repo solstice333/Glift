@@ -42,8 +42,9 @@ optional arguments:
   -z, --zdepth=VALUE         depth of the extrusion VALUE units across the z 
                                axis. Defaults to 50. Exit 1 if VALUE is a non-
                                integer
-  -t, --thickness-outline    thickness of outline in VALUE units. Defaults to 
-                               20. Exit 1 if VALUE is a non-integer
+  -t, --thickness-outline=VALUE
+                             thickness of outline in VALUE units. Defaults to 
+                               10. Exit 1 if VALUE is a non-integer
   -h, --help                 show this message and exit
 ```
 
