@@ -63,5 +63,4 @@ an A.obj will be written to the current directory. Opening it up in meshlab look
 
 ## TODO
 
-- miter joints
 - cmd line arg for reducing number of triangles in mesh
