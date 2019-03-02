@@ -54,7 +54,7 @@ optional arguments:
 
 ```
 $ cd path/to/Glift/Glift/bin/Debug
-$ mono Glift.exe -c A -s 300 ../../../GliftTest/Resources/Alef-Bold.ttf
+$ mono Glift.exe -c A ../../../GliftTest/Resources/Alef-Bold.ttf
 ```
 
 an A.obj will be written to the current directory. Opening it up in meshlab looks something like...

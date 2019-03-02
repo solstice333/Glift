@@ -32,7 +32,7 @@ namespace Glift {
         private Arm[] _frontArms;
 
         private Matrix4x4 _transl;
-        private Matrix4x4 _xyScale;
+        private Matrix4x4 _xyzScale;
 
         private delegate void _TriAdder(Triangle3 t);
         private delegate void _VertexAdder(Point3 p);
@@ -393,7 +393,7 @@ namespace Glift {
             _frontArms = null;
 
             _transl = Matrix4x4.CreateTranslation(xoffset, yoffset, 0);
-            _xyScale = Matrix4x4.CreateScale(sizeMult, sizeMult, 1f);
+            _xyzScale = Matrix4x4.CreateScale(sizeMult, sizeMult, sizeMult);
 
             _FaceToVertexStore = new Dictionary<Face, VertexStore> {
                 { Face.Front, _frontVertexStore },
@@ -459,7 +459,7 @@ namespace Glift {
         public IEnumerable<Point3> Vertices(Face face = Face.All) {
             return _FaceToVertGetter[face](face).Select(
                 p => Vector3.Transform(p, _transl)).Select(
-                p => Vector3.Transform(p, _xyScale));
+                p => Vector3.Transform(p, _xyzScale));
         }
 
         public IEnumerable<Triangle3> Triangles(Face face = Face.All) {
