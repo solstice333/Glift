@@ -8,7 +8,7 @@ using Point3 = System.Numerics.Vector3;
 namespace Glift {
     public class Prismoid {
         private Point3Pair _centerline;
-        private int _thickness;
+        private float _thickness;
         private Square _square1;
         private Square _square2;
 
@@ -67,7 +67,7 @@ namespace Glift {
                 _InitSquare2();
         }
 
-        public Prismoid(Point3Pair segment, int thickness) {
+        public Prismoid(Point3Pair segment, float thickness) {
             _AssertSegmentIs2DXY(segment);
             _thickness = thickness;
             _square1 = null;
@@ -83,7 +83,7 @@ namespace Glift {
             }
         }
 
-        public int HalfThickness {
+        public float HalfThickness {
             get => _thickness / 2;
             set {
                 _thickness = value * 2;
@@ -91,7 +91,7 @@ namespace Glift {
             }
         }
 
-        public int Thickness {
+        public float Thickness {
             get => _thickness;
             set {
                 _thickness = value;

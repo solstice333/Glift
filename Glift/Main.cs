@@ -77,10 +77,11 @@ namespace Glift {
     class MainClass {
         public delegate void WriteLine(string msg = "");
 
-        public static RawGlyph[] GetRawGlyphs(float sizeInPoints) {
+        public static RawGlyph[] GetRawGlyphs() {
             using (var fstrm = File.OpenRead(Args.ttfPath)) {
                 var reader = new OpenFontReader();
                 Typeface typeface = reader.Read(fstrm);
+                float defaultSizeInPoints = 72f;
 
                 GlyphNameMap[] nameIdxs = Globals.allGlyphs ?
                     typeface.GetGlyphNameIter().ToArray() :
@@ -91,7 +92,7 @@ namespace Glift {
                 return nameIdxs.Select(nameId => {
                     var builder = new GlyphPathBuilder(typeface);
                     builder.BuildFromGlyphIndex(
-                        nameId.glyphIndex, sizeInPoints);
+                        nameId.glyphIndex, defaultSizeInPoints);
 
                     var transl = new GlyphTranslatorToPath();
                     var wrPath = new WritablePath();
@@ -147,7 +148,7 @@ namespace Glift {
         public static void Main(string[] args) {
             Args.Parse(args);
             Globals.allGlyphs = Args.chars.Count == 0;
-            RawGlyph[] glyphs = GetRawGlyphs(Args.sizePt);
+            RawGlyph[] glyphs = GetRawGlyphs();
             List<FaceTask> faceTasks = CreateFaceTasks();
 
             WriteLine tee = null;
@@ -172,7 +173,8 @@ namespace Glift {
                     tee?.Invoke($"# {g.Name}");
                     var vtxCache = new VertexCache(g,
                         Args.zdepth, Args.thickness, 
-                        Args.xoffset, Args.yoffset);
+                        Args.xoffset, Args.yoffset,
+                        Args.sizeMult);
                     foreach (Point3 pt in vtxCache.VerticesOfFace(task.Face))
                         tee?.Invoke($"v {pt.X} {pt.Y} {pt.Z}");
                     foreach (

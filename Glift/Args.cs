@@ -11,10 +11,10 @@ namespace Glift {
         public static bool outlineOnly = false;
         public static float xoffset = 0f;
         public static float yoffset = 0f;
-        public static int zdepth = -50;
-        public static int thickness = 10;
+        public static int zdepth = -15;
+        public static float thickness = 2.5f;
         public static string ttfPath = "";
-        public static float sizePt = 300f;
+        public static float sizeMult = 1f;
         public static bool listNames = false;
         public static bool print = false;
         public static bool dryRun = false;
@@ -62,11 +62,11 @@ namespace Glift {
                 v => dryRun = true
             },
             {
-                "s|size=", "size in points (1/72 of 1 inch). " +
-                "Defaults to 300. Exit 1 if VALUE is not a valid floating " +
-                "point",
+                "s|size=", "size multiplier. The multiplicand is " +
+                "72 points. The multiplier defaults to 1. Exit 1 if " +
+                "VALUE is not a valid floating point",
                 v => {
-                    help = !float.TryParse(v, out sizePt);
+                    help = !float.TryParse(v, out sizeMult);
                     exst = help ? 1 : 0;
                 }
             },
@@ -88,7 +88,7 @@ namespace Glift {
             },
             {
                 "z|zdepth=", "depth of the extrusion VALUE units across " +
-                "the z axis. Defaults to 50. Exit 1 if VALUE is a non-integer",
+                "the z axis. Defaults to 15. Exit 1 if VALUE is a non-integer",
                 v => {
                     help = !int.TryParse(v, out zdepth);
                     zdepth = -zdepth;
@@ -97,9 +97,10 @@ namespace Glift {
             },
             {
                 "t|thickness-outline=", "thickness of outline in VALUE " +
-                "units. Defaults to 10. Exit 1 if VALUE is a non-integer",
+                "units. Defaults to 10. Exit 1 if VALUE is not a valid " +
+                "floating point",
                 v => {
-                    help = !int.TryParse(v, out thickness);
+                    help = !float.TryParse(v, out thickness);
                     exst = help ? 1 : 0;
                 }
             },

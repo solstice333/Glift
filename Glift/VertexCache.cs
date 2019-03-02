@@ -16,7 +16,7 @@ namespace Glift {
         private int _zdepth;
         private Point3[] _extrudedPoints;
         private List<SideFace> _sideFaces;
-        private int _thickness;
+        private float _thickness;
 
         private VertexStore _vertexStore;
         private VertexStore _frontVertexStore;
@@ -32,6 +32,7 @@ namespace Glift {
         private Arm[] _frontArms;
 
         private Matrix4x4 _transl;
+        private Matrix4x4 _xyScale;
 
         private delegate void _TriAdder(Triangle3 t);
         private delegate void _VertexAdder(Point3 p);
@@ -369,8 +370,8 @@ namespace Glift {
         }
 
         public VertexCache(
-            RawGlyph glyph, int zdepth = 0, int thickness = 0,
-            float xoffset = 0, float yoffset = 0,
+            RawGlyph glyph, int zdepth = 0, float thickness = 0,
+            float xoffset = 0, float yoffset = 0, float sizeMult = 1,
             VertexStore.Type containerType = VertexStore.Type.List) {
             _glyph = glyph;
             _zdepth = zdepth;
@@ -392,6 +393,7 @@ namespace Glift {
             _frontArms = null;
 
             _transl = Matrix4x4.CreateTranslation(xoffset, yoffset, 0);
+            _xyScale = Matrix4x4.CreateScale(sizeMult, sizeMult, 1f);
 
             _FaceToVertexStore = new Dictionary<Face, VertexStore> {
                 { Face.Front, _frontVertexStore },
@@ -456,7 +458,8 @@ namespace Glift {
 
         public IEnumerable<Point3> Vertices(Face face = Face.All) {
             return _FaceToVertGetter[face](face).Select(
-                p => Vector3.Transform(p, _transl));
+                p => Vector3.Transform(p, _transl)).Select(
+                p => Vector3.Transform(p, _xyScale));
         }
 
         public IEnumerable<Triangle3> Triangles(Face face = Face.All) {

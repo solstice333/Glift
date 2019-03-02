@@ -210,7 +210,8 @@ namespace GliftTest {
 
             var ttf = TtfFile("Alef-Bold.ttf");
             GliftRun($"-c B -c A -c S " +
-                $"--xoffset -105.32 --yoffset -105.241 " +
+                $"--size 1.25 " +
+                $"--xoffset -34.99 --yoffset -34.99 --zdepth 10 " +
                 $"--front-only --side-only --outline-only {ttf}");
 
             FileAssert.AreEqual(actualASide, expectedASide);

@@ -8,7 +8,7 @@ namespace Glift {
         private Point3Pair _lowerSegment;
         private Prismoid _upperPrismoid;
         private Prismoid _lowerPrismoid;
-        private int _thickness;
+        private float _thickness;
 
         private void _AssertUpperVecIsXY2D() {
             if (!UpperSegment.P1.Z.EqualsEps(0) ||
@@ -35,7 +35,7 @@ namespace Glift {
             return UpperSegment.P2.ToPoint2XY() - UpperSegment.P1.ToPoint2XY();
         }
 
-        public int Thickness {
+        public float Thickness {
             get => _thickness;
             set {
                 _thickness = value;
@@ -93,7 +93,7 @@ namespace Glift {
         }
 
         public Arm(
-            Point3Pair upperSegment, Point3Pair lowerSegment, int thickness) {
+            Point3Pair upperSegment, Point3Pair lowerSegment, float thickness) {
             _upperSegment = upperSegment;
             _lowerSegment = lowerSegment;
             _thickness = thickness;

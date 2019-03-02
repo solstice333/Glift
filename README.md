@@ -13,7 +13,7 @@ Tested on OSX, 10.11.6 at the oldest. Open Glift/Glift.sln in Visual Studio Comm
 Hopefully the help description below will suffice. If it does not, then let me know.
 
 ```
-usage: Glift [OPTIONS]+ TTF
+usage: Glift.exe [OPTIONS]+ TTF
 
 convert .ttf glyphs to .obj
 
@@ -32,8 +32,9 @@ optional arguments:
   -p, --print                print .obj to console
   -d, --dry-run              do not write to .obj. Useful with -p if printing 
                                to console is the only requirement
-  -s, --size=VALUE           size in points (1/72 of 1 inch). Defaults to 30-
-                               0. Exit 1 if VALUE is not a valid floating point
+  -s, --size=VALUE           size multiplier. The multiplicand is 72 points. 
+                               The multiplier defaults to 1. Exit 1 if VALUE is 
+                               not a valid floating point
   -x, --xoffset=VALUE        translate the model VALUE units across the x 
                                axis. Exit 1 if VALUE is not a valid floating 
                                point
@@ -41,13 +42,12 @@ optional arguments:
                                axis. Exit 1 if VALUE is not a valid floating 
                                point
   -z, --zdepth=VALUE         depth of the extrusion VALUE units across the z 
-                               axis. Defaults to 50. Exit 1 if VALUE is a non-
+                               axis. Defaults to 15. Exit 1 if VALUE is a non-
                                integer
   -t, --thickness-outline=VALUE
                              thickness of outline in VALUE units. Defaults to 
-                               10. Exit 1 if VALUE is a non-integer
+                               10. Exit 1 if VALUE is not a valid floating point
   -h, --help                 show this message and exit
-
 ```
 
 ## Example
@@ -63,4 +63,5 @@ an A.obj will be written to the current directory. Opening it up in meshlab look
 
 ## TODO
 
+- accept list of points in text file, assume single contour 
 - cmd line arg for reducing number of triangles in mesh
