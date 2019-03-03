@@ -163,6 +163,11 @@ namespace Glift {
 
                 StreamWriter objWriter = null;
 
+                var vtxCache = new VertexCache(g,
+                    Args.zdepth, Args.thickness,
+                    Args.xoffset, Args.yoffset,
+                    Args.sizeMult);
+
                 foreach (FaceTask task in faceTasks) {
                     if (!Args.dryRun) {
                         objWriter = File.CreateText(
@@ -171,10 +176,7 @@ namespace Glift {
                     }
 
                     tee?.Invoke($"# {g.Name}");
-                    var vtxCache = new VertexCache(g,
-                        Args.zdepth, Args.thickness, 
-                        Args.xoffset, Args.yoffset,
-                        Args.sizeMult);
+
                     foreach (Point3 pt in vtxCache.VerticesOfFace(task.Face))
                         tee?.Invoke($"v {pt.X} {pt.Y} {pt.Z}");
                     foreach (
