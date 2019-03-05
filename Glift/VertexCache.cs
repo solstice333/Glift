@@ -88,11 +88,14 @@ namespace Glift {
             Point3[] verts, int currIdx, int startIdx, int contourEndIdx,
             Point3 point0, out Point3 point1, out Point3 point2) {
             int offset = 0;
+            int offsetToCurrIdx = 1;
 
             try {
-                if (currIdx + 1 > contourEndIdx)
-                    throw new IndexOutOfRangeException();
-                point1 = verts[currIdx + 1];
+                do {
+                    if (currIdx + offsetToCurrIdx > contourEndIdx)
+                        throw new IndexOutOfRangeException();
+                    point1 = verts[currIdx + offsetToCurrIdx++];
+                } while (point0.EqualsEps(point1));
             }
             catch (IndexOutOfRangeException) {
                 do {
@@ -107,9 +110,11 @@ namespace Glift {
             }
 
             try {
-                if (currIdx + 2 > contourEndIdx)
-                    throw new IndexOutOfRangeException();
-                point2 = verts[currIdx + 2];
+                do {
+                    if (currIdx + offsetToCurrIdx > contourEndIdx)
+                        throw new IndexOutOfRangeException();
+                    point2 = verts[currIdx + offsetToCurrIdx++];
+                } while (point1.EqualsEps(point2));
             }
             catch (IndexOutOfRangeException) {
                 do {
@@ -129,12 +134,11 @@ namespace Glift {
                     _WrapPointsAroundAtContourEnd(
                         frontVerts, i, start, end, p0, out p1, out p2);
 
-                    if (!p0.EqualsEps(p1) && !p1.EqualsEps(p2))
-                        frontArms.Add(new Arm(
-                            new Point3Pair(p0, p1),
-                            new Point3Pair(p1, p2),
-                            _thickness
-                        ));
+                    frontArms.Add(new Arm(
+                        new Point3Pair(p0, p1),
+                        new Point3Pair(p1, p2),
+                        _thickness
+                    ));
                 });
 
             return frontArms.ToArray();
