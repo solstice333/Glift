@@ -32,4 +32,5 @@ optional arguments:
   -t, --thickness-outline=VALUE
                              thickness of outline in VALUE units. Defaults to 
                                10. Exit 1 if VALUE is not a valid floating point
+      --experimental         enable experimental features
   -h, --help                 show this message and exit

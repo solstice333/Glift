@@ -12,20 +12,15 @@ namespace Glift {
         private Square _square1;
         private Square _square2;
 
-        private enum RelativePoint { P1, P2 }
+        private enum AnchorPoint { P1, P2 }
 
-        private static void _AssertSegmentIs2DXY(Point3Pair segment) {
-            if (!segment.P1.IsPoint2DXY() || !segment.P2.IsPoint2DXY())
-                throw new Non2DXYException(segment);
-        }
-
-        private Point3[] _SquarePoints(RelativePoint point) {
+        private Point3[] _SquarePoints2DXY(AnchorPoint point) {
             Point2 p1 = _centerline.P1.ToPoint2XY();
             Point2 p2 = _centerline.P2.ToPoint2XY();
 
-            Point2 relativePoint = p1;
-            if (point == RelativePoint.P2)
-                relativePoint = p2;
+            Point2 anchorPt = p1;
+            if (point == AnchorPoint.P2)
+                anchorPt = p2;
 
             Vector2 vec = p2 - p1;
             Vector2 unitUp = Vector2.Normalize(vec.Rotate90CW());
@@ -34,8 +29,8 @@ namespace Glift {
             Vector2 halfDistUp = unitUp * HalfThickness;
             Vector2 halfDistDown = unitDown * HalfThickness;
 
-            Point3 upPt = (relativePoint + halfDistUp).ToPoint3();
-            Point3 downPt = (relativePoint + halfDistDown).ToPoint3();
+            Point3 upPt = (anchorPt + halfDistUp).ToPoint3();
+            Point3 downPt = (anchorPt + halfDistDown).ToPoint3();
 
             Point3 upPtTowards = upPt;
             Point3 upPtAway = upPt;
@@ -52,12 +47,43 @@ namespace Glift {
             };
         }
 
+        private Point3[] _SquarePoints3D(AnchorPoint point) {
+            Point3 p1 = _centerline.P1;
+            Point3 p2 = _centerline.P2;
+
+            Point3 anchorPt = p1;
+            if (point == AnchorPoint.P2)
+                anchorPt = p2;
+
+            Matrix4x4 translUpLeft = 
+                Matrix4x4.CreateTranslation(-HalfThickness, HalfThickness, 0);
+            Matrix4x4 translUpRight =  
+                Matrix4x4.CreateTranslation(HalfThickness, HalfThickness, 0);
+            Matrix4x4 translDownRight = 
+                Matrix4x4.CreateTranslation(HalfThickness, -HalfThickness, 0);
+            Matrix4x4 translDownLeft = 
+                Matrix4x4.CreateTranslation(-HalfThickness, -HalfThickness, 0);
+
+            return new Point3[] {
+                Vector3.Transform(anchorPt, translUpLeft),
+                Vector3.Transform(anchorPt, translUpRight),
+                Vector3.Transform(anchorPt, translDownRight),
+                Vector3.Transform(anchorPt, translDownLeft)
+            };
+        }
+
+        private Point3[] _SquarePoints(AnchorPoint point) {
+            if (_centerline.P1.IsPoint2DXY() && _centerline.P2.IsPoint2DXY())
+                return _SquarePoints2DXY(point);
+            return _SquarePoints3D(point);
+        }
+
         private void _InitSquare1() {
-            _square1 = new Square(_SquarePoints(RelativePoint.P1));
+            _square1 = new Square(_SquarePoints(AnchorPoint.P1));
         }
 
         private void _InitSquare2() {
-            _square2 = new Square(_SquarePoints(RelativePoint.P2));
+            _square2 = new Square(_SquarePoints(AnchorPoint.P2));
         }
 
         private void _InitVerticesIfNull() {
@@ -68,7 +94,6 @@ namespace Glift {
         }
 
         public Prismoid(Point3Pair segment, float thickness) {
-            _AssertSegmentIs2DXY(segment);
             _thickness = thickness;
             _square1 = null;
             _square2 = null;

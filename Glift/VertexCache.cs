@@ -31,7 +31,10 @@ namespace Glift {
 
         private Arm[] _frontArms;
 
+        private Prismoid[] _sideOutline;
+
         private Matrix4x4 _transl;
+        private Matrix4x4 _translZ;
         private Matrix4x4 _xyzScale;
 
         private delegate void _TriAdder(Triangle3 t);
@@ -237,10 +240,9 @@ namespace Glift {
             if (_zdepth == 0)
                 return;
 
-            var transl = Matrix4x4.CreateTranslation(0, 0, _zdepth);
             var extPoints = 
                 _NonTranslatedVertices(Face.Front).Select(
-                    p => Vector3.Transform(p, transl)).ToArray();
+                    p => Vector3.Transform(p, _translZ)).ToArray();
             _extrudedPoints = extPoints;
             foreach (Point3 p in extPoints) {
                 _vertexStore.Add(p);
@@ -388,6 +390,83 @@ namespace Glift {
             }
         }
 
+        private void _GatherPrismoidSideOutline() {
+            if (_zdepth == 0)
+                return;
+
+            var prismoids = new List<Prismoid>();
+            foreach (Point3 p in _frontSkeletonVertexStore.Vertices) {
+                var pp = new Point3Pair(p, Vector3.Transform(p, _translZ));
+                var moid = new Prismoid(pp, _thickness);
+                prismoids.Add(moid);
+            }
+            _sideOutline = prismoids.ToArray();
+
+            foreach (Prismoid moid in _sideOutline) {
+                _VertexAdder addVert = _vertexStore.Add;
+                addVert += _outlineVertexStore.Add;
+
+                foreach (Point3 p in moid.PointsCWStartUpperLeft)
+                    addVert(p);
+            }
+        }
+
+        private void _GatherPrismoidSideOutlineTess() {
+            foreach (Prismoid moid in _sideOutline) {
+                var tessaTop1 = new Triangle3(
+                    moid.Square1UpLeft,
+                    moid.Square1UpRight,
+                    moid.Square2UpRight);
+
+                var tessaTop2 = new Triangle3(
+                    moid.Square1UpLeft,
+                    moid.Square2UpRight,
+                    moid.Square2UpLeft);
+
+                var tessaRight1 = new Triangle3(
+                    moid.Square1UpRight,
+                    moid.Square2DownRight,
+                    moid.Square2UpRight);
+
+                var tessaRight2 = new Triangle3(
+                    moid.Square1UpRight,
+                    moid.Square1DownRight,
+                    moid.Square2DownRight);
+
+                var tessaDown1 = new Triangle3(
+                    moid.Square1DownLeft,
+                    moid.Square2DownLeft,
+                    moid.Square2DownRight);
+
+                var tessaDown2 = new Triangle3(
+                    moid.Square1DownLeft,
+                    moid.Square2DownRight,
+                    moid.Square1DownRight);
+
+                var tessaLeft1 = new Triangle3(
+                    moid.Square1UpLeft,
+                    moid.Square2UpLeft,
+                    moid.Square2DownLeft);
+
+                var tessaLeft2 = new Triangle3(
+                    moid.Square1UpLeft,
+                    moid.Square2DownLeft,
+                    moid.Square1DownLeft);
+
+                _TriAdder addTri = _tris.Add;
+                addTri += _outlineTris.Add;
+
+                addTri(tessaTop1);
+                addTri(tessaTop2);
+                addTri(tessaRight1);
+                addTri(tessaRight2);
+                addTri(tessaDown1);
+                addTri(tessaDown2);
+                addTri(tessaLeft1);
+                addTri(tessaLeft2);
+            }
+        }
+
         public VertexCache(
             RawGlyph glyph, int zdepth = 0, float thickness = 0,
             float xoffset = 0, float yoffset = 0, float sizeMult = 1,
@@ -410,8 +489,10 @@ namespace Glift {
             _outlineTris = new List<Triangle3>();
 
             _frontArms = null;
+            _sideOutline = null;
 
             _transl = Matrix4x4.CreateTranslation(xoffset, yoffset, 0);
+            _translZ = Matrix4x4.CreateTranslation(0, 0, _zdepth);
             _xyzScale = Matrix4x4.CreateScale(sizeMult, sizeMult, sizeMult);
 
             _FaceToVertexStore = new Dictionary<Face, VertexStore> {
@@ -457,6 +538,11 @@ namespace Glift {
             _InitArms();
             _GatherPrismoidMainOutline();
             _GatherPrismoidMainOutlineTess();
+
+            if (Args.experimental) {
+                _GatherPrismoidSideOutline();
+                _GatherPrismoidSideOutlineTess();
+            }
         }
 
         public VertexStore.Type ContainerType {

@@ -19,6 +19,7 @@ namespace Glift {
         public static bool print = false;
         public static bool dryRun = false;
         public static int exst = 0;
+        public static bool experimental = false;
 
         private static OptionSet _parser = new OptionSet {
             {
@@ -103,6 +104,10 @@ namespace Glift {
                     help = !float.TryParse(v, out thickness);
                     exst = help ? 1 : 0;
                 }
+            },
+            {
+                "experimental", "enable experimental features",
+                v => experimental = true
             },
             {
                 "h|help", "show this message and exit",

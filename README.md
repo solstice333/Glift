@@ -47,6 +47,7 @@ optional arguments:
   -t, --thickness-outline=VALUE
                              thickness of outline in VALUE units. Defaults to 
                                10. Exit 1 if VALUE is not a valid floating point
+      --experimental         enable experimental features
   -h, --help                 show this message and exit
 ```
 
@@ -63,5 +64,6 @@ an A.obj will be written to the current directory. Opening it up in meshlab look
 
 ## TODO
 
-- accept list of points in text file, assume single contour 
+- update tests WRT side outlines
+- detect curves, maybe by processing angles or segment length, to filter excess side outlines
 - cmd line arg for reducing number of triangles in mesh
