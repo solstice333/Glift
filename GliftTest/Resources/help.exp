@@ -13,6 +13,15 @@ optional arguments:
       --front-only           generate a .obj for the front face only
       --side-only            generate a .obj for the side face only
       --outline-only         generate a .obj for the outline face only
+  -a, --angle=VALUE          angle (in degrees) restriction for generating 
+                               side outlines where anything less than VALUE 
+                               will have side outlines (prismoids) generated 
+                               for that joint. In other words, if VALUE is 135, 
+                               any joint along the front outline, whose angle 
+                               is less than 135 degrees will have a side 
+                               outline/prismoid generated at that joint. VALUE 
+                               defaults to 135. Exit 1 if VALUE is not a valid 
+                               double precision format
   -l, --list-names           list glyph names
   -p, --print                print .obj to console
   -d, --dry-run              do not write to .obj. Useful with -p if printing 

@@ -390,22 +390,29 @@ namespace Glift {
             }
         }
 
-        private void _GatherPrismoidSideOutline() {
+        private void _InitSideOutlinePrismoids() {
             if (_zdepth == 0)
                 return;
 
             var prismoids = new List<Prismoid>();
-            foreach (Point3 p in _frontSkeletonVertexStore.Vertices) {
+            foreach (Arm a in _frontArms) {
+                if (a.Angle.ToDegrees() >= Args.angle)
+                    continue;
+                Point3 p = a.UpperSegment.P2;
                 var pp = new Point3Pair(p, Vector3.Transform(p, _translZ));
                 var moid = new Prismoid(pp, _thickness);
                 prismoids.Add(moid);
             }
             _sideOutline = prismoids.ToArray();
+        }
+
+        private void _GatherPrismoidSideOutline() {
+            if (_zdepth == 0)
+                return;
 
             foreach (Prismoid moid in _sideOutline) {
                 _VertexAdder addVert = _vertexStore.Add;
                 addVert += _outlineVertexStore.Add;
-
                 foreach (Point3 p in moid.PointsCWStartUpperLeft)
                     addVert(p);
             }
@@ -538,11 +545,9 @@ namespace Glift {
             _InitArms();
             _GatherPrismoidMainOutline();
             _GatherPrismoidMainOutlineTess();
-
-            if (Args.experimental) {
-                _GatherPrismoidSideOutline();
-                _GatherPrismoidSideOutlineTess();
-            }
+            _InitSideOutlinePrismoids();
+            _GatherPrismoidSideOutline();
+            _GatherPrismoidSideOutlineTess();
         }
 
         public VertexStore.Type ContainerType {

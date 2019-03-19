@@ -92,6 +92,15 @@ namespace Glift {
             get => _UpperVec2XY(true);
         }
 
+        public double Angle {
+            get {
+                Vector2 a = -UpperVec2XYSafe;
+                Vector2 b = LowerVec2XYSafe;
+                double dot = Vector2.Dot(a, b);
+                return Math.Acos(dot / (a.Length() * b.Length()));
+            }
+        }
+
         public Arm(
             Point3Pair upperSegment, Point3Pair lowerSegment, float thickness) {
             _upperSegment = upperSegment;

@@ -102,6 +102,7 @@
     <Compile Include="VertexIter.cs" />
     <Compile Include="Prismoid.cs" />
     <Compile Include="Square.cs" />
+    <Compile Include="DoubleExt.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Util\" />

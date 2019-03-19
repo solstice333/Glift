@@ -28,6 +28,15 @@ optional arguments:
       --front-only           generate a .obj for the front face only
       --side-only            generate a .obj for the side face only
       --outline-only         generate a .obj for the outline face only
+  -a, --angle=VALUE          angle (in degrees) restriction for generating 
+                               side outlines where anything less than VALUE 
+                               will have side outlines (prismoids) generated 
+                               for that joint. In other words, if VALUE is 135, 
+                               any joint along the front outline, whose angle 
+                               is less than 135 degrees will have a side 
+                               outline/prismoid generated at that joint. VALUE 
+                               defaults to 135. Exit 1 if VALUE is not a valid 
+                               double precision format
   -l, --list-names           list glyph names
   -p, --print                print .obj to console
   -d, --dry-run              do not write to .obj. Useful with -p if printing 
@@ -66,4 +75,6 @@ an A.obj will be written to the current directory. Opening it up in meshlab look
 
 - update tests WRT side outlines
 - detect curves, maybe by processing angles or segment length, to filter excess side outlines
+- also look into curve detection by processing the pre-flattened control points
+- keep any eye for why scaling causes 72 to not be 72. It's speculated that Typography causes this when flattening points
 - cmd line arg for reducing number of triangles in mesh

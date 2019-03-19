@@ -19,6 +19,7 @@ namespace Glift {
         public static bool print = false;
         public static bool dryRun = false;
         public static int exst = 0;
+        public static double angle = 135;
         public static bool experimental = false;
 
         private static OptionSet _parser = new OptionSet {
@@ -48,6 +49,20 @@ namespace Glift {
             {
                 "outline-only", "generate a .obj for the outline face only",
                 v => outlineOnly = true
+            },
+            {
+                "a|angle=", "angle (in degrees) restriction for generating " +
+                "side outlines where anything less than VALUE will have " +
+                "side outlines (prismoids) generated for that joint. In " +
+                "other words, if VALUE is 135, any joint along the front " +
+                "outline, whose angle is less than 135 degrees will have a " +
+                "side outline/prismoid generated at that joint. VALUE " +
+                "defaults to 135. Exit 1 if VALUE is not a valid double " +
+                "precision format",
+                v => {
+                    help = !double.TryParse(v, out angle);
+                    exst = help ? 1 : 0;
+                }
             },
             {
                 "l|list-names", "list glyph names",
