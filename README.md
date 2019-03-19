@@ -73,8 +73,6 @@ an A.obj will be written to the current directory. Opening it up in meshlab look
 
 ## TODO
 
-- update tests WRT side outlines
-- detect curves, maybe by processing angles or segment length, to filter excess side outlines
 - also look into curve detection by processing the pre-flattened control points
 - keep any eye for why scaling causes 72 to not be 72. It's speculated that Typography causes this when flattening points
 - cmd line arg for reducing number of triangles in mesh
