@@ -76,3 +76,5 @@ an A.obj will be written to the current directory. Opening it up in meshlab look
 - also look into curve detection by processing the pre-flattened control points
 - keep any eye for why scaling causes 72 to not be 72. It's speculated that Typography causes this when flattening points
 - cmd line arg for reducing number of triangles in mesh
+- make it so we can generate the front face only of the outlines, at z=0
+- make it so we can use glift as a library, so we can link it in and generate outlines at runtime!
